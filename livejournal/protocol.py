@@ -345,14 +345,24 @@ class LiveJournal:
 
         pass
 
-    def getdaycounts (self):
+    def getdaycounts (self, usejournal = None):
         '''getdaycounts - This mode retrieves the number of journal entries per day.
 
         This mode retrieves the number of journal entries per day. Useful for
         populating calendar widgets in GUI clients. Optionally a journal can be
         specified. It returns a list of the dates and accompanied counts.'''
 
-        pass
+        if self.user is not None:
+            args = self._required_headers ()
+
+            if usejournal is not None:
+                args.usejournal = usejournal
+
+            result = self._do_request ('getdaycounts', args)
+        else:
+            result = None
+
+        return result
 
     def syncitems (self, lastsync = None):
         '''syncitems - Returns a list of all the items that have been created or updated for a user.
