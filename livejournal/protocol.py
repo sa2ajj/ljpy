@@ -32,6 +32,9 @@ def getdate (when = None):
 
     return result
 
+def listofdict (what):
+    return map (lambda x, m = dictm : m (**x), what)
+
 class LiveJournal:
     def __init__ (self, clientversion, base = 'http://www.livejournal.com/interface/xmlrpc', verbose = 0):
         self.lj = Server (base, verbose = verbose)
@@ -58,6 +61,8 @@ class LiveJournal:
                 getpickwurls = '1'))
             self.user = user
             self.password = password
+
+            result = dictm (**result)
         except Fault:
             self.user = None
             self.password = None
@@ -188,6 +193,23 @@ class LiveJournal:
                 args.friendlimit = friendlimit
 
             result = self._do_request ('getfriends', args.__dict__)
+
+            if result.has_key ('friends'):
+                friends = listofdict (result['friends'])
+            else:
+                friends = None
+
+            if result.has_key ('friendofs'):
+                friendofs = listofdict (result['friendofs'])
+            else:
+                friendofs = None
+
+            if result.has_key ('friendgroups'):
+                friendgroups = listofdict (result['friendgroups'])
+            else:
+                friendgroups = None
+
+            result = friends, friendofs, friendgroups
         else:
             result = None
 
@@ -207,7 +229,7 @@ class LiveJournal:
 
     def checkfriends (self, lastupdate = '', mask = 0):
         if self.user is not None:
-            result = dictm (self._do_request ('checkfriends', mdict (username = self.user,
+            result = dictm (**self._do_request ('checkfriends', mdict (username = self.user,
                 hpassword = md5 (self.password).hexdigest (),
                 ver = 1,
                 clientversion = self.clientversion,
