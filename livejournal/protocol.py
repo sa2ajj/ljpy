@@ -8,7 +8,7 @@ from time import time, localtime
 
 from pprint import pprint
 
-_date = re.compile (r'')
+_date = re.compile (r'(?P<year>[12][0-9]{3})-(?P<mon>[0-9]{1,2})-(?P<day>[0-9]{1,2}) (?P<hour>[0-9]{1,2}):(?P<min>[0-9]{2})')
 
 def mdict (**kw):
     return kw
@@ -16,6 +16,17 @@ def mdict (**kw):
 class dictm:
     def __init__ (self, **kw):
         self.__dict__.update (kw)
+
+def set_date (args, when = None):
+    if when is None:
+        args.year, args.mon, args.day, args.hour, args.min, dummy, dummy, dummy, dummy = localtime (time ())
+    else:
+        match = _date.match (when)
+
+        if not match:
+            raise '%s does not match the date specification' % when
+
+        args.__dict__.update (match.groupdict ())
 
 class LiveJournal:
     def __init__ (self, clientversion, verbose = 0):
@@ -44,17 +55,19 @@ class LiveJournal:
 
         return result
 
-    def postevent (self, subject, event, usejournal = None, security = None, when = None, props = None):
+    def postevent (self, event, subject = None, usejournal = None, security = None, when = None, props = None):
         if self.user is not None:
             assert type (event) == UnicodeType
-            assert type (subject) == UnicodeType
+            assert subject is None or type (subject) == UnicodeType
 
             args = dictm (username = self.user,
                 hpassword = md5 (self.password).hexdigest (),
                 ver = 1,
                 clientversion = self.clientversion,
-                event = event.encode ('utf-8'),
-                subject = subject.encode ('utf-8'))
+                event = event.encode ('utf-8'))
+
+            if subject is not None:
+                args.subject = subject.encode ('utf-8')
 
             if usejournal is not None:
                 args.usejournal = usejournal
@@ -70,8 +83,7 @@ class LiveJournal:
                 args.security = 'usemask'
                 args.allowmask = security
 
-            if when is None:
-                args.year, args.mon, args.day, args.hour, args.min, dummy, dummy, dummy, dummy = localtime (time ())
+            set_date (args, when)
 
             if type (props) is DictType:
                 args.props = props
