@@ -1,7 +1,6 @@
 #! /usr/bin/python
 
 import sys
-from os.path import expanduser
 
 from locale import getdefaultlocale
 
@@ -11,11 +10,11 @@ except ImportError:
     printf >> sys.stderr, "Optik module is really required for this program to work"
     sys.exit (1)
 
-from livejournal import LiveJournal, list2mask, Config, evalue
+from livejournal import LiveJournal, list2list, list2mask, Config, evalue
 
 lang, defaultenc = getdefaultlocale ()
 
-parser = OptionParser ()
+parser = OptionParser (usage = 'Usage: %prog [options] [message text with spaces]')
 
 parser.add_option ('-C', '--config', type='string', dest='config', default = None,
                    help = 'specify config file',
@@ -51,7 +50,7 @@ parser.add_option ('-M', '--music',
                    help = 'tell them what music you are listening to',
                    metavar = 'MUSIC')
 parser.add_option ('-b', '--batch',
-                   action = 'store_true', dest = 'batch', default = 0,
+                   action = 'store_true', dest = 'batch', default = None,
                    help = 'use in a batch: the text will be read from the standard input and posted right away')
 parser.add_option ('-i', '--include',
                    action = 'store', dest = 'draft', default = None,
@@ -62,22 +61,21 @@ options, args = parser.parse_args ()
 
 encoding = evalue (defaultenc, options.encoding)
 
+subject = options.subject
+
 if len (args) > 0:
-    event = ' '.join (args)
+    body = ' '.join (args)
 else:
-    event = sys.stdin.read ()
-
-event = unicode (event, encoding)
-
-if options.subject is not None:
-    subject = unicode (options.subject, encoding)
-else:
-    subject = None
+    body = ''
 
 props = {}
 
-if options.preformatted:
-    props['opt_preformatted'] = 1
+if options.options is not None:
+    for option in list2list (options.options):
+        if option in [ 'preformatted', 'nocomments', 'backdated', 'noemail' ]:
+            props['opt_%s' % option] = 1
+        else:
+            print 'Ignoring unknown option:', option
 
 if options.mood is not None:
     props['current_mood'] = options.mood
@@ -89,6 +87,8 @@ config = Config ()
 config.load (evalue ('~/.ljrc', options.config))
 
 server = config.server
+ljp = config.ljp
+
 username = evalue (server.username, options.username)
 password = evalue (server.password, options.password)
 
@@ -101,10 +101,32 @@ usejournal = evalue (None, options.journal)
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 info = lj.login (username, password)
-entry = lj.postevent (event,
+
+security = list2mask (options.security, info.friendgroups)
+
+print 'FYI:', None, ljp.batch, options.batch, evalue (None, ljp.batch, options.batch)
+
+if evalue (None, ljp.batch, options.batch):
+    body = body + '\n' + sys.stdin.read ()
+else:
+    print 'Sorry, non-batch mode is not supported yet'
+    sys.exit (1)
+
+body = unicode (body, encoding)
+
+if subject is not None:
+    subject = unicode (subject, encoding)
+
+if props.has_key ('current_mood'):
+    props['current_mood'] = unicode (props['current_mood'], encoding)
+
+if props.has_key ('current_music'):
+    props['current_music'] = unicode (props['current_music'], encoding)
+
+entry = lj.postevent (body,
                 usejournal = usejournal,
                 subject = subject,
                 props = props,
-                security = list2mask (options.security, info.friendgroups))
+                security = security)
 
 print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (usejournal or server.username, entry.itemid*256 + entry.anum)
