@@ -115,7 +115,7 @@ class LiveJournal:
 
         return args
 
-    def login (self, user, password):
+    def login (self, user, password, getmoods = None, getmenus = None, getpickws = None, getpickwurls = None):
         '''login - validate user's password and get base information needed for
         client to function
 
@@ -127,7 +127,19 @@ class LiveJournal:
         try:
             hpassword = md5 (password).hexdigest ()
 
-            args = self._required_headers (username = user, hpassword = hpassword, getmoods = 134, getpickws = 1, getpickwurls = 1)
+            args = self._required_headers (username = user, hpassword = hpassword)
+
+            if getmoods is not None:
+                args.getmoods = getmoods
+
+            if getmenus is not None:
+                args.getmenus = getmenus
+
+            if getpickws is not None:
+                args.getpickws = getpickws
+                
+            if getpickwurls is not None:
+                args.getpickwurls = getpickwurls
 
             result = self._do_request ('login', args)
 
