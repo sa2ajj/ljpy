@@ -6,6 +6,7 @@ from os.path import expanduser
 from optik import OptionParser
 
 from livejournal import LiveJournal, mdict
+from config import Config
 
 parser = OptionParser ()
 parser.add_option ('-s', '--subject',
@@ -49,16 +50,10 @@ props: %s
 event:
 %s''' % (subject, props, event)
 
-if 1:
-    user = 'mss'
-    password = 'rogazzi'
-elif 0:
-    user = 'test'
-    password = 'test'
-else:
-    user, password = 'leftaw', 'none'
+config = Config ()
+config.load ('lj.conf')
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
-lj.login (user, password)
+lj.login (config.username, config.password)
 print lj.postevent (event, subject = subject, props = props)

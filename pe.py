@@ -3,19 +3,14 @@
 from os.path import expanduser
 
 from livejournal import LiveJournal
+from config import Config
 
-if 1:
-    user = 'mss'
-    password = 'rogazzi'
-elif 0:
-    user = 'test'
-    password = 'test'
-else:
-    user, password = 'leftaw', 'none'
+config = Config ()
+config.load ('lj.conf')
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 from pprint import pprint
 
-pprint (lj.login (user, password))
+pprint (lj.login (config.username, config.password))
 pprint (lj.postevent (unicode ('Тестовая тема', 'koi8-r'), unicode ('Тело тестового сообщения', 'koi8-r')))
