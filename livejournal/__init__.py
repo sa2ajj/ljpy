@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software 
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-#
+
 # this file just provides a list of all stuff we expect the developer to use
 
-__all__ = [ 'LiveJournal', 'LJError', 'Config', 'evalue']
+__all__ = [ 'LiveJournal', 'LJError', 'Config', 'evalue', 'getdate', 'list2list', 'list2mask' ]
 
-from livejournal.livejournal import LiveJournal, LJError, getdate
 from livejournal.config import Config, evalue
-from utils import list2list, list2mask
+from livejournal.utils import list2list, list2mask
+from livejournal.protocol import LiveJournal, LJError, getdate
