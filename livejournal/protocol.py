@@ -35,7 +35,9 @@ _date = re.compile (r'(?P<year>[12][0-9]{3})-(?P<mon>[0-9]{1,2})-(?P<day>[0-9]{1
 def mdict (**kw):
     return kw
 
-class dictm:
+class record:
+    '''helper class to represent structures'''
+
     def __init__ (self, **kw):
         self.__dict__.update (kw)
 
@@ -54,8 +56,10 @@ def getdate (when = None):
 
     return result
 
-def listofdict (what):
-    return map (lambda x, m = dictm : m (**x), what)
+def listofrecords (what):
+    '''listofrecords -- process a list of dictionaries, creating a list of 'record's'''
+
+    return map (lambda x, m = record : m (**x), what)
 
 class LJError (Exception):
     pass
@@ -87,12 +91,12 @@ class LiveJournal:
     def _do_request (self, mode, args):
         method = getattr (self.lj.LJ.XMLRPC, mode)
 
-        if isinstance (args, dictm):
+        if isinstance (args, record):
             result = method (args.__dict__)
         elif type (args) == DictType:
             result = method (args)
         else:
-            raise LJError ('invalid argument for _do_request: must be either an instance of dictm or a dictionary')
+            raise LJError ('invalid argument for _do_request: must be either an instance of record or a dictionary')
 
         return result
 
@@ -101,7 +105,7 @@ class LiveJournal:
             raise LJError ('Must be logged in')
 
     def _required_headers (self, **other):
-        args = dictm (ver = 1, clientversion = self.clientversion, **other)
+        args = record (ver = 1, clientversion = self.clientversion, **other)
 
         if self.user is not None:
             args.username = self.user
@@ -129,8 +133,8 @@ class LiveJournal:
             self.hpassword = hpassword
 
             result['message'] = result.get ('message', None)
-            result = dictm (**result)
-            result.friendgroups = listofdict (result.friendgroups)
+            result = record (**result)
+            result.friendgroups = listofrecords (result.friendgroups)
         except Fault:
             self.user = None
             self.hpassword = None
@@ -241,6 +245,15 @@ class LiveJournal:
         pass
 
     def getevents (self):
+        '''getevents - Download parts of the user's journal.
+
+        Given a set of specifications, will return a segment of entries up to a
+        limit set by the server. Has a set of options for less, extra, or special
+        data to be returned.
+        
+        However, this function just raises an exception, as it was splitted out to
+        a number of functions dealing with different cases.'''
+
         raise 'Sorry this function is not implemented in a way as it is described in LJ'
 
     def _getevents (self, args, usejournal, truncate, prefersubjects, noprops):
@@ -271,7 +284,7 @@ class LiveJournal:
                 else:
                     item[k] = v
 
-            result.append (dictm (**item))
+            result.append (record (**item))
 
         return result
 
@@ -342,17 +355,17 @@ class LiveJournal:
         result = self._do_request ('getfriends', args)
 
         if result.has_key ('friends'):
-            friends = listofdict (result['friends'])
+            friends = listofrecords (result['friends'])
         else:
             friends = None
 
         if result.has_key ('friendofs'):
-            friendofs = listofdict (result['friendofs'])
+            friendofs = listofrecords (result['friendofs'])
         else:
             friendofs = None
 
         if result.has_key ('friendgroups'):
-            friendgroups = listofdict (result['friendgroups'])
+            friendgroups = listofrecords (result['friendgroups'])
         else:
             friendgroups = None
 
@@ -415,7 +428,9 @@ class LiveJournal:
         if lastsync is not None:
             args.lastsync = lastsync
 
-        result = dictm (**self._do_request ('syncitems', args))
+        result = record (**self._do_request ('syncitems', args))
+
+        result.syncitems = listofrecords (result.syncitems)
 
         return result
 
@@ -432,7 +447,7 @@ class LiveJournal:
 
         args = self._required_headers (lastupdate = lastupdate, mask = mask)
 
-        result = dictm (**self._do_request ('checkfriends', args))
+        result = record (**self._do_request ('checkfriends', args))
 
         return result
 
