@@ -28,6 +28,8 @@ from types import StringType, UnicodeType, DictType
 import re
 from time import time, localtime
 
+__version__ = '$Revision$'
+
 _date = re.compile (r'(?P<year>[12][0-9]{3})-(?P<mon>[0-9]{1,2})-(?P<day>[0-9]{1,2}) (?P<hour>[0-9]{1,2}):(?P<min>[0-9]{2})')
 
 def mdict (**kw):
