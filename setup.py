@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup (
 	name = "ljpy",
-	version = "0.6",
+	version = "0.7",
 	description = "Module and scripts for working with LiveJournal -- http://www.livejournal.com",
 	author = "Mikhail Sobolev",
 	author_email = "mss@mawhrin.net",
