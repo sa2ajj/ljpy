@@ -4,7 +4,12 @@ import sys
 from os.path import expanduser
 
 from locale import getdefaultlocale
-from optik import OptionParser
+
+try:
+    from optik import OptionParser
+except ImportError
+    printf >> sys.stderr, "Optik module is really required for this program to work"
+    sys.exit (1)
 
 from livejournal import LiveJournal, list2mask, Config, evalue
 
@@ -75,10 +80,16 @@ config = Config ()
 config.load (evalue ('~/.ljrc', options.config))
 
 server = config.server
+username = evalue (server.username, options.username)
+password = evalue (server.password, options.password)
+
+if username is None or password is None:
+    print "You must provide both user name and password"
+    sys.exit (2)
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
-info = lj.login (server.username, server.password)
+info = lj.login (username, password)
 entry = lj.postevent (event, subject = subject, props = props, security = list2mask (options.security, info.friendgroups))
 
 print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (server.username, entry.itemid*256 + entry.anum)
