@@ -6,13 +6,15 @@ import readline
 from livejournal import LiveJournal, Config
 
 config = Config ()
-config.load ('lj.conf')
+config.load ('~/.ljrc')
+
+server = config.server
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 from pprint import pprint
 
-info = lj.login (config.username, config.password)
+info = lj.login (server.username, server.password)
 
 if info.message is not None:
     print 'Message from server:', info.message
