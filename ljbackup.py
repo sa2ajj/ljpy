@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 from time import strftime, localtime, gmtime
+from os.path import expanduser
 
 cdata = lambda x: '<![CDATA[%s]]>' % x
 
@@ -10,7 +11,7 @@ def nicedatetime (what):
 from livejournal import LiveJournal, Config, evalue
 from livejournal.config import std_parser
 
-parser = std_parser (usage = 'Usage: %prog [options]')
+parser = std_parser (usage = '%prog [options]')
 
 parser.add_option ('-f', '--file', type='string', dest='file', default = 'lj.backup',
                    help = 'specify the file to store the backup to',
@@ -40,7 +41,7 @@ info = lj.login (username, password)
 if info.message is not None:
     print 'Server:', info.message
 
-backup = open (backupname, 'w')
+backup = open (expanduser (backupname), 'w')
 
 print 'Synchronizing...'
 
