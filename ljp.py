@@ -11,7 +11,7 @@ except ImportError:
     sys.exit (1)
 
 from livejournal import LiveJournal, list2list, list2mask, Config, evalue
-from livejournal.config add_std_options
+from livejournal.config import add_std_options
 
 lang, defaultenc = getdefaultlocale ()
 
@@ -92,7 +92,7 @@ if username is None or password is None:
 
 usejournal = evalue (None, options.journal)
 
-lj = LiveJournal ('Python-ljpy/0.0.1')
+lj = LiveJournal ('Python-ljpy/0.1.0')
 
 info = lj.login (username, password)
 
