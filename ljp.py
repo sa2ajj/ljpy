@@ -6,7 +6,7 @@ from os.path import expanduser
 from locale import getdefaultlocale
 from optik import OptionParser
 
-from livejournal import LiveJournal, mdict, list2mask, Config, evalue
+from livejournal import LiveJournal, list2mask, Config, evalue
 
 lang, enc = getdefaultlocale ()
 
