@@ -613,10 +613,15 @@ class ConfigSection:
         else:
             self._config.set (self._section, name, value)
 
+_spaces = re.compile (r'\s*,\s*')
+
+def list2list (arg):
+    return _spaces.split (arg)
+
 l2m_specials = [ 'public', 'private', 'friends' ]
 
 def list2mask (arg, groups):
-    gg = map (lambda x : x.lower (), arg.split (','))
+    gg = map (lambda x : x.lower (), list2list (arg))
 
     for special in l2m_specials:
         if special in gg:
