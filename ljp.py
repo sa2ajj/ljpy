@@ -104,8 +104,6 @@ info = lj.login (username, password)
 
 security = list2mask (options.security, info.friendgroups)
 
-print 'FYI:', None, ljp.batch, options.batch, evalue (None, ljp.batch, options.batch)
-
 if evalue (None, ljp.batch, options.batch):
     body = body + '\n' + sys.stdin.read ()
 else:
