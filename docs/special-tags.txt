@@ -1,0 +1,60 @@
+FAQ Question
+
+What are the LJ-specific tags?
+
+There are 5 LJ-specific markup tags, for use in some of the places where HTML is allowed: 
+
+1. <lj user="username"> 
+
+... where "username" can be the username of any LiveJournal user. This is
+    displayed as a bold link to the journal, with a 'head' icon that links to
+    the profile page (User Info). 
+
+2. <lj comm="community"> 
+
+... where "community" can be the username of any LiveJournal community. This is
+    displayed as a bold link to the community, with a 'compass' icon that links
+    to the profile page (Community Info). 
+
+3. <lj-cut> ... </lj-cut> 
+
+... which can be used in a journal entry to hide part of, or all of an entry.
+    When the entry appears in your journal or on someone's Friends page,
+    everything after an <lj-cut> tag and before a closing </lj-cut> tag will be
+    replaced by a link to the Read Comments page. The Read Comments page always
+    displays the entire entry as well as any comments made on it. When the
+    <lj-cut> is closed with </lj-cut>, any text placed after the closing
+    </lj-cut> tag will also display on the journal, instead of just on the Read
+    Comments page. 
+
+    By default, the link will say "Read more", but if you want it to say
+    something else like "Cut off here", you can write the tag as <lj-cut
+    text="Cut off here"> 
+
+4. <lj-poll> ... </lj-poll> 
+
+... which members with Paid status can use to include a poll in a journal
+    entry. For more information on polls see:
+    (http://www.livejournal.com/support/faqbrowse.bml?faqid=69). 
+
+
+5. <lj-raw> ... </lj-raw> 
+
+... which disables the auto-insertion of line breaks on sections of your post.
+    This provides the same functionality as the "Don't auto-format" checkbox,
+    but can be used to only stop auto-formatting on a section of your post,
+    instead of the entire post. For more information on "Don't auto-format", go
+    here: ( http://www.livejournal.com/support/faqbrowse.bml?faqid=26 ) 
+
+
+Additionally, there are 3 LJ-specific URL forms that will only work when posted on a journal held on the LiveJournal.com servers : 
+
+<a href="lj://user/news">The News Journal</a> will make a link to news 
+
+<a href="lj://support/3777">Support Request #3777</a> will make a link to the 3777th support request, and 
+
+<a href="lj://faq/64">FAQ #64</a> will take you the 64th FAQ, on the LiveJournal servers ( http://www.livejournal.com/support/faq.bml ) 
+
+------------------------------------ 
+Thanks to http://www.livejournal.com/users/vyxn for contributing extra information.
+
