@@ -294,6 +294,12 @@ class LiveJournal:
         pass
 
     def getdaycounts (self):
+        '''getdaycounts - This mode retrieves the number of journal entries per day.
+
+        This mode retrieves the number of journal entries per day. Useful for
+        populating calendar widgets in GUI clients. Optionally a journal can be
+        specified. It returns a list of the dates and accompanied counts.'''
+
         pass
 
     def syncitems (self):
