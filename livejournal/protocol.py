@@ -32,7 +32,8 @@ from time import time, localtime
 __version__ = '$Revision$'
 __date__ = '$Date$'
 
-_date = re.compile (r'(?P<year>[12][0-9]{3})-(?P<mon>[0-9]{1,2})-(?P<day>[0-9]{1,2}) (?P<hour>[0-9]{1,2}):(?P<min>[0-9]{2})')
+_date_time = re.compile (r'(?P<year>[12][0-9]{3})-(?P<mon>[0-9]{1,2})-(?P<day>[0-9]{1,2}) (?P<hour>[0-9]{1,2}):(?P<min>[0-9]{2})')
+_date = re.compile (r'(?P<year>[12][0-9]{3})-(?P<mon>[0-9]{1,2})-(?P<day>[0-9]{1,2})')
 
 def mdict (**kw):
     return kw
@@ -43,16 +44,23 @@ class record:
     def __init__ (self, **kw):
         self.__dict__.update (kw)
 
-def getdate (when = None):
+def getdate (when = None, dateonly = None):
     if when is None:
         year, mon, day, hour, min, dummy, dummy, dummy, dummy = localtime (time ())
 
         result = year, mon, day, hour, min
-    else:
+    elif dateonly:
         match = _date.match (when)
 
         if not match:
             raise '%s does not match the date specification' % when
+
+        result = match.group ('year'), match.group ('mon'), match.group ('day')
+    else:
+        match = _date_time.match (when)
+
+        if not match:
+            raise '%s does not match the date/time specification' % when
 
         result = match.group ('year'), match.group ('mon'), match.group ('day'), match.group ('hour'), match.group ('min')
 
@@ -401,7 +409,7 @@ class LiveJournal:
 
         args = self._required_headers (selecttype = 'day')
 
-        args.year, args.mon, args.day, args.hour, args.min = getdate (date)
+        args.year, args.month, args.day = getdate (date, dateonly = 1)
 
         return self._getevents (args, usejournal, truncate, prefersubject, noprops)
 
