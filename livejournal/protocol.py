@@ -27,7 +27,7 @@ from xmlrpclib import Server, Binary, binary, Fault
 from md5 import md5
 from types import StringType, UnicodeType, DictType
 import re
-from time import time, localtime, asctime
+from time import time, localtime
 
 __version__ = '$Revision$'
 __date__ = '$Date$'
@@ -325,13 +325,13 @@ class LiveJournal:
         appropriate method.'''
 
         if selecttype == 'lastn':
-            result = self.getevents_last (*args, **kw)
+            result = self.getevents_last (*args, **kws)
         elif selecttype == 'day':
-            result = self.getevents_day (*args, **kw)
+            result = self.getevents_day (*args, **kws)
         elif selecttype == 'one':
-            result = self.getevent (*args, **kw)
+            result = self.getevent (*args, **kws)
         elif selecttype == 'syncitems':
-            result = self.getevents_sync (*args, **kw)
+            result = self.getevents_sync (*args, **kws)
         else:
             raise 'Unknown type: %s' % selecttype
 
