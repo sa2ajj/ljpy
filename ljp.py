@@ -6,7 +6,7 @@ from os.path import expanduser
 from locale import getdefaultlocale
 from optik import OptionParser
 
-from livejournal import LiveJournal, mdict, Config, list2mask
+from livejournal import LiveJournal, mdict, list2mask, Config, evalue
 
 lang, enc = getdefaultlocale ()
 
@@ -17,10 +17,10 @@ parser.add_option ('-u', '--username', type='string', dest='username', default =
 parser.add_option ('-p', '--password', type='string', dest='password', default = None,
                    help = 'specify password, otherwise the one from the configuration file is used',
                    metavar = 'PASSWORD')
-parser.add_option ('-C', '--config', type='string', dest='config', default = 'lj.conf',
+parser.add_option ('-C', '--config', type='string', dest='config', default = None,
                    help = 'specify config file',
                    metavar = 'CONFIG')
-parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = enc,
+parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
                    help = 'specify character encoding',
                    metavar = 'ENCODING')
 parser.add_option ('-j', '--journal', type='string', dest='journal', default = None,
@@ -72,11 +72,13 @@ if options.music is not None:
     props['current_music'] = options.music
 
 config = Config ()
-config.load (options.config)
+config.load (evalue ('~/.ljrc', options.config))
+
+server = config.server
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
-info = lj.login (config.username, config.password)
+info = lj.login (server.username, server.password)
 entry = lj.postevent (event, subject = subject, props = props, security = list2mask (options.security, info.friendgroups))
 
-print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (config.username, entry.itemid*256 + entry.anum)
+print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (server.username, entry.itemid*256 + entry.anum)

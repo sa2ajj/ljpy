@@ -22,11 +22,14 @@ The method documentation was copied from the appropriate articles.  I am not
 that sure that this is really OK.
 '''
 
+import os
 from xmlrpclib import Server, Binary, binary, Fault
 from md5 import md5
 from types import StringType, UnicodeType, DictType
 import re
 from time import time, localtime, asctime
+
+from ConfigParser import ConfigParser, NoOptionError
 
 from pprint import PrettyPrinter
 
@@ -556,53 +559,59 @@ class Moods:
         self._moods = {}
         self.children = {}
 
+def evalue (*values):
+    '''find an effective value'''
+
+    result = values[0]
+
+    for i in range (len (values) - 1, 1, -1):
+        if values[i] is not None:
+            result = values[i]
+            break
+
+    return result
+
 class Config:
-    '''A special class for dealing with "configuration" files.'''
-
-    valid_params = [ 'username', 'password' ]
-
-    def __init__ (self, **kw):
-        self.update (kw)
-
-    def update (self, what):
-        for k, v in what.items ():
-            setattr (self, k, v)
-
-    def __setattr__ (self, name, value):
-        if name not in self.valid_params:
-            raise KeyError, 'invalid key: %s' % name
-
-        self.__dict__[name] = value
+    def __init__ (self):
+        pass
 
     def load (self, name):
-        tempo = {}
+        self._cp = ConfigParser ()
+        self._cp.read (os.path.expanduser (name))
 
+    def __hasattr__ (self, name):
+        return self._cp.has_section (name)
+
+    def __getattr__ (self, name):
+        return ConfigSection (self._cp, name)
+
+    def __setattr__ (self, name, value):
+        if name in [ '_cp' ]:
+            self.__dict__[name] = value
+        else:
+            pass # do nothing
+
+class ConfigSection:
+    def __init__ (self, config, section):
+        self._config = config
+        self._section = section
+
+    def __hasattr__ (self, name):
+        return self._config.has_option (self._section, name)
+
+    def __getattr__ (self, name):
         try:
-            tempo = {}
-            execfile (name, tempo)
-        except IOError, exc:
-            if exc.filename is None:    # arg! execfile() loses filename
-                exc.filename = name
-            raise exc
+            result = self._config.get (self._section, name)
+        except NoOptionError:
+            result = None
 
-        for name in self.valid_params:
-            if tempo.has_key (name):
-                setattr (self, name, tempo[name])
+        return result
 
-    def save (self, name):
-        output = open (name + '.new', 'w')
-
-        output.write ('# This file was automagically generated on: %s\n\n' % asctime ())
-
-        names = self.__dict__.keys ()
-        names.sort ()
-
-        pp = PrettyPrinter (stream = output, indent = 2)
-
-        for name in names:
-            output.write ('%s = ' % name)
-            pp.pprint (getattr (self, name))
-            output.write ('\n')
+    def __setattr__ (self, name, value):
+        if name in [ '_config', '_section' ]:
+            self.__dict__[name] = value
+        else:
+            self._config.set (self._section, name, value)
 
 l2m_specials = [ 'public', 'private', 'friends' ]
 
