@@ -17,16 +17,20 @@ class dictm:
     def __init__ (self, **kw):
         self.__dict__.update (kw)
 
-def set_date (args, when = None):
+def getdate (when = None):
     if when is None:
-        args.year, args.mon, args.day, args.hour, args.min, dummy, dummy, dummy, dummy = localtime (time ())
+        year, mon, day, hour, min, dummy, dummy, dummy, dummy = localtime (time ())
+
+        result = year, mon, day, hour, min
     else:
         match = _date.match (when)
 
         if not match:
             raise '%s does not match the date specification' % when
 
-        args.__dict__.update (match.groupdict ())
+        result = match.group ('year'), match.group ('mon'), match.group ('day'), match.group ('hour'), match.group ('min')
+
+    return result
 
 class LiveJournal:
     def __init__ (self, clientversion, verbose = 0):
@@ -83,10 +87,10 @@ class LiveJournal:
                 args.security = 'usemask'
                 args.allowmask = security
 
-            set_date (args, when)
+            args.year, args.mon, args.day, args.hour, args.min = getdate (when)
 
             if type (props) is DictType:
-                args.props = props
+                args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
 
             result = self.lj.LJ.XMLRPC.postevent (args.__dict__)
         else:
