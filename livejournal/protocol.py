@@ -288,17 +288,28 @@ class LiveJournal:
 
         return result
 
-    def getevents (self):
+    def getevents (self, selecttype, *args, **kws):
         '''getevents - Download parts of the user's journal.
 
         Given a set of specifications, will return a segment of entries up to a
         limit set by the server. Has a set of options for less, extra, or special
         data to be returned.
         
-        However, this function just raises an exception, as it was splitted out to
-        a number of functions dealing with different cases.'''
+        This class is a simple dispatcher: it consumes one argument and calls the
+        appropriate method.'''
 
-        raise 'Sorry this function is not implemented in a way as it is described in LJ'
+        if selecttype == 'lastn':
+            result = self.getevents_last (*args, **kw)
+        elif selecttype == 'day':
+            result = self.getevents_day (*args, **kw)
+        elif selecttype == 'one':
+            result = self.getevent (*args, **kw)
+        elif selecttype == 'syncitems':
+            result = self.getevents_sync (*args, **kw)
+        else:
+            raise 'Unknown type: %s' % selecttype
+
+        return result
 
     def _getevents (self, args, usejournal, truncate, prefersubjects, noprops):
         '''helper function to process what getevents returned'''
@@ -546,6 +557,8 @@ class Moods:
         self.children = {}
 
 class Config:
+    '''A special class for dealing with "configuration" files.'''
+
     valid_params = [ 'username', 'password' ]
 
     def __init__ (self, **kw):
