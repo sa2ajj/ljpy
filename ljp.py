@@ -3,35 +3,29 @@
 import sys
 from os.path import expanduser
 
+from locale import getdefaultlocale
 from optik import OptionParser
 
-from livejournal import LiveJournal, mdict
-from config import Config
+from livejournal import LiveJournal, mdict, Config, list2mask
 
-specials = [ 'public', 'private', 'friends' ]
-
-def s2s (arg, groups):
-    gg = map (lambda x : x.lower (), arg.split (','))
-
-    for special in specials:
-        if special in gg:
-            gg = special
-            break
-
-    if gg in specials:
-        security = gg
-    else:
-        mask = 0
-
-        for group in groups:
-            if group.name in gg:
-                mask |= (1 << group.id)
-
-        security = str (mask)
-
-    return security
+lang, enc = getdefaultlocale ()
 
 parser = OptionParser ()
+parser.add_option ('-u', '--username', type='string', dest='username', default = None,
+                   help = 'specify username, otherwise the one from the configuration file is used',
+                   metavar = 'USER')
+parser.add_option ('-p', '--password', type='string', dest='password', default = None,
+                   help = 'specify password, otherwise the one from the configuration file is used',
+                   metavar = 'PASSWORD')
+parser.add_option ('-C', '--config', type='string', dest='config', default = 'lj.conf',
+                   help = 'specify config file',
+                   metavar = 'CONFIG')
+parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = enc,
+                   help = 'specify character encoding',
+                   metavar = 'ENCODING')
+parser.add_option ('-j', '--journal', type='string', dest='journal', default = None,
+                   help = 'specify the journal to post to',
+                   metavar = 'JOURNAL')
 parser.add_option ('-s', '--subject',
                    action = 'store', type = 'string', dest = 'subject', default = None,
                    help = 'specify a subject for the event',
@@ -48,6 +42,9 @@ parser.add_option ('-S', '--security',
                    action = 'store', type = 'string', dest = 'security', default = 'public',
                    help = 'restrict access to the item',
                    metavar = 'SECURITY')
+parser.add_option ('-P', '--preformatted',
+                   action = 'store_true', dest = 'preformatted',
+                   help = 'consider the item to be preformatted', default = 0)
 
 options, args = parser.parse_args ()
 
@@ -63,10 +60,10 @@ if options.subject is not None:
 else:
     subject = None
 
-if 0:
-    props = { 'opt_preformatted' : 1 }
-else:
-    props = { }
+props = {}
+
+if options.preformatted:
+    props['opt_preformatted'] = 1
 
 if options.mood is not None:
     props['current_mood'] = options.mood
@@ -74,18 +71,12 @@ if options.mood is not None:
 if options.music is not None:
     props['current_music'] = options.music
 
-if 0:
-    print '''subject: %s
-props: %s
-event:
-%s''' % (subject, props, event)
-
 config = Config ()
-config.load ('lj.conf')
+config.load (options.config)
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 info = lj.login (config.username, config.password)
-entry = lj.postevent (event, subject = subject, props = props, security = s2s (options.security, info.friendgroups))
+entry = lj.postevent (event, subject = subject, props = props, security = list2mask (options.security, info.friendgroups))
 
 print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (config.username, entry.itemid*256 + entry.anum)
