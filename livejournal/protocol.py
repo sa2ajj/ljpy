@@ -33,8 +33,8 @@ def getdate (when = None):
     return result
 
 class LiveJournal:
-    def __init__ (self, clientversion, verbose = 0):
-        self.lj = Server ('http://www.livejournal.com/interface/xmlrpc', verbose = verbose)
+    def __init__ (self, clientversion, base = 'http://www.livejournal.com/interface/xmlrpc', verbose = 0):
+        self.lj = Server (base, verbose = verbose)
         self.clientversion = clientversion
 
         self.user = None
@@ -50,11 +50,13 @@ class LiveJournal:
                 getmoods = 134,
                 # getmenus = 'yes',
                 getpickws = '1',
-                getpickwurls = '1'
-                ))
+                getpickwurls = '1'))
             self.user = user
             self.password = password
         except Fault:
+            self.user = None
+            self.password = None
+
             result = None
 
         return result
@@ -110,12 +112,10 @@ class LiveJournal:
     def getevents (self):
         raise 'Sorry this function is not implemented in a way as it is described in LJ'
 
-        # assert selecttype in [ 'day', 'lastn', 'one', 'syncitems']
-
     def _getevents (self, args):
         '''helper function to process what getevents returned'''
 
-        what = self.lj.LJ.XMLRPC.getevents (args)
+        what = self.lj.LJ.XMLRPC.getevents (args.__dict__)
 
         result = []
 
@@ -132,14 +132,19 @@ class LiveJournal:
 
         return result
 
-    def getevents_last (self, howmany = 20, before = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+    def getevents_last (self, howmany = 20, beforedate = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
         if self.user is not None:
-            args = mdict (username = self.user,
+            # mss: i am not sure that this assert is a really good idea: lj should return an error anyway.
+            assert howmany <= 50
+            args = dictm (username = self.user,
                 hpassword = md5 (self.password).hexdigest (),
                 ver = 1,
                 clientversion = self.clientversion,
                 selecttype = 'lastn',
-                howmany = howmany)))
+                howmany = howmany)
+
+            if beforedate is not None:
+                args.beforedate = beforedate
 
             result = self._getevents (args)
         else:
@@ -161,8 +166,29 @@ class LiveJournal:
     def getevents_sync (self, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
         pass
 
-    def getfriends (self):
-        pass
+    def getfriends (self, includefriendof = None, includegroups = None, friendlimit = None):
+        if self.user is not None:
+            args = dictm (username = self.user,
+                hpassword = md5 (self.password).hexdigest (),
+                ver = 1,
+                clientversion = self.clientversion)
+
+            if includegroups is not None and includegroups:
+                args.includegroups = 1
+
+            if includefriendof is not None and includefriendof:
+                args.includefriendof = 1
+
+            if friendlimit is not None:
+                args.friendlimit = friendlimit
+
+            pprint (args.__dict__)
+
+            result = self.lj.LJ.XMLRPC.getfriends (args.__dict__)
+        else:
+            result = None
+
+        return result
 
     def friendof (self):
         pass
@@ -178,13 +204,13 @@ class LiveJournal:
 
     def checkfriends (self, lastupdate = '', mask = 0):
         if self.user is not None:
-            result = self.lj.LJ.XMLRPC.checkfriends (mdict (username = self.user,
+            result = dictm (self.lj.LJ.XMLRPC.checkfriends (mdict (username = self.user,
                 hpassword = md5 (self.password).hexdigest (),
                 ver = 1,
                 clientversion = self.clientversion,
                 lastupdate = lastupdate,
                 mask = mask
-                ))
+                )))
         else:
             result = None
 
