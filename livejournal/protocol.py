@@ -134,6 +134,7 @@ class LiveJournal:
             self.hpassword = hpassword
 
             result['message'] = result.get ('message', None)
+            result['fastserver'] = result.get ('fastserver', None)
             result = record (**result)
             result.friendgroups = listofrecords (result.friendgroups)
         except Fault:
