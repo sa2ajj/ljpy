@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+from pprint import PrettyPrinter
+
 class dictm:
     def __init__ (self, **kw):
         self.__dict__.update (kw)
@@ -137,29 +139,56 @@ moods =  [{'parent': 2, 'id': 1, 'name': 'aggravated'},
            {'parent': 25, 'id': 133, 'name': 'jealous'},
            {'parent': 46, 'id': 134, 'name': 'nervous'}]
 
-nmoods = {}
+class Moods:
+    def __init__ (self):
+        self.nmoods = {}
+        self.children = {}
 
-children = {}
+    def load (self, file):
+        try:
+            tempo = {}
+            execfile (file, tempo)
+        except IOError, exc:
+            if exc.filename is None:    # arg! execfile() loses filename
+                exc.filename = filename
+            raise exc
 
-for mood in moods:
-    _mood = dictm (**mood)
+    def save (self, name):
+        f = open (name, 'w')
 
-    nmoods[_mood.id] = (_mood.name, _mood.parent)
+        pp = PrettyPrinter (stream = f, indent = 2)
+        f.write ('nmoods = ')
+        pp.pprint (self.nmoods)
 
-    if not children.has_key (_mood.parent):
-       children[_mood.parent] = []
+        f.write ('\nchildren = ')
+        pp.pprint (self.children)
 
-    children[_mood.parent].append (_mood.id)
+        f.close ()
+        f = None
 
-from pprint import pprint
+    def update (self, moods):
+        for mood in moods:
+            _mood = dictm (**mood)
 
-# pprint (nmoods)
+            self.nmoods[_mood.id] = (_mood.name, _mood.parent)
 
-def dump_mood (id, spaces = 1):
-    for mood in children[id]:
-        print ' ' * spaces, mood, nmoods[mood][0]
+            if not self.children.has_key (_mood.parent):
+                self.children[_mood.parent] = []
 
-        if children.has_key (mood):
-            dump_mood (mood, spaces + 2)
+            self.children[_mood.parent].append (_mood.id)
 
-dump_mood (0)
+    def dump_mood (self, id, spaces = 1):
+        for mood in self.children[id]:
+            print ' ' * spaces, mood, self.nmoods[mood][0]
+
+            if self.children.has_key (mood):
+                self.dump_mood (mood, spaces + 2)
+
+    def id (self, what):
+        pass
+
+m = Moods ()
+m.update (moods)
+m.dump_mood (0)
+
+m.save ('testing-moods')
