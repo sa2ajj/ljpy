@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>login</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.45"><link rel="home" href="index.html" title="LiveJournal Server"><link rel="up" href="ljp.csp.xml-rpc.protocol.html" title="XML-RPC Client/Server Protocol Reference"><link rel="previous" href="ljp.csp.xml-rpc.protocol.html" title="XML-RPC Client/Server Protocol Reference"><link rel="next" href="ljp.csp.xml-rpc.postevent.html" title="postevent"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">login</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ljp.csp.xml-rpc.protocol.html">Prev</a> </td><th width="60%" align="center">XML-RPC Client/Server Protocol Reference</th><td width="20%" align="right"> <a accesskey="n" href="ljp.csp.xml-rpc.postevent.html">Next</a></td></tr></table><hr></div><div class="refentry"><h1 class="title"><a name="ljp.csp.xml-rpc.login"></a>login</h1><div class="refnamediv"><h2>Name</h2><p>login &#8212; 
+validate user's password and get base information needed for client to function
+</p></div><div class="refsect1"><h2>Mode Description</h2><p>
+Login to the server, while announcing your client version.  The server returns with whether the password is good or not, the user's name, an optional message to be displayed to the user, the list of the user's friend groups, and other things.
+</p></div><div class="refsect1"><h2>Arguments</h2><div class="orderedlist"><ol type="1"><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>username</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Username of user logging in.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>password</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Password of user logging in in plaintext.  Either this or &quot;hpassword&quot; must be present.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>hpassword</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    MD5 digest of user's password.  Not much more secure than password, but at least it's not in plain text.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>ver</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Protocol version supported by the client; assumed to be 0 if not specified. See <a href="ljp.csp.versions.html" title="Chapter 8. Protocol Versions">Chapter 8</a> for details on the protocol version
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>clientversion</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Although optional, this should be a string of the form Platform-ProductName/ClientVersionMajor.Minor.Rev, like Win32-MFC/1.2.7 or Gtk-LoserJabber/1.0.4.  Note in this case that &quot;Gtk&quot; is not a platform, but rather a toolkit, since the toolkit is multi-platform (Linux, FreeBSD, Solaris, Windows...).  You make the judge what is best to send, but if it's of this form, we'll give you cool statistics about your users.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>getmoods</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If your client supports moods, send this key with a value of the highest mood ID you have cached/stored on the user's computer.  For example, if you logged in last time with and got mood IDs 1, 2, 4, and 5, then send &quot;5&quot; as the value of &quot;getmoods&quot;.  The server will return every new mood that has an internal MoodID greater than 5.  If you've never downloaded moods before, send &quot;0&quot;.  If you don't care about getting any moods at all (if your client doesn't support them), then don't send this key at all.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>getmenus</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Send something for this key if you want to get a list/tree of web jump menus to show in your client.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>getpickws</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If your client supports picture keywords and you want to receive that list, send something for this key, like &quot;1&quot;, and you'll receieve the list of picture keywords the user has defined.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>getpickwurls</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If your client supports picture keywords and can also display the pictures somehow, send something for this key, like &quot;1&quot;, and you'll receieve the list of picture keyword URLs that correspond to the picture keywords.  You must send getpickws for this option to even matter.
+</p></li></ul></div></p></li></ul></div></p></li></ol></div></div><div class="refsect1"><h2>Return Values</h2><div class="orderedlist"><ol type="1"><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>name</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The user's full name.  Often, clients use this to change the top-level window's title bar text to say something like &quot;LiveJournal - User name&quot;.  You can just ignore this if you'd like.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>message</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+A message that should be displayed in a dialog box (or to the screen in a console application).  The message is rarely present but when used notifies the user of software updates they've requested to hear about, problems with their account (if mail is bouncing to them, we'd like them to give us a current email address), etc.  To test this if you're developing a client, use the user account test with the password test and a message will always be returned.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>friendgrounds</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>id</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The bit number for this friend group, from 1-30.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>name</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The name of this friend group.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>sortorder</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The sort integer for this friend group, from 0-255.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>public</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Either '0' or '1' for if this friend group is public.
+</p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>usejournals</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(optional; multiple allowed)
+Username of community journal.
+</p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>moods</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>id</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+                The integer moodid.
+            </p></li></ul></div></p></li><li><p><span class="bold"><b>name</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+                The mood name.
+            </p></li></ul></div></p></li><li><p><span class="bold"><b>parent</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+                The mood's parent (base) moodid.
+            </p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>pickws</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(optional; multiple allowed)
+The picture keyword.	    
+</p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>pickwurls</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(optional; multiple allowed)
+The picture URL.
+</p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>fastserver</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+LiveJournal sites may have priority servers for paying customers.  If this key is both present and set to value &quot;1&quot;, then the client has permission to set the &quot;ljfastserver&quot; cookie in subsequent requests.  The HTTP request header to send is &quot;Cookie: ljfastserver=1&quot;.  If you send this header without getting permission from the login mode, your requests will fail.  That is, you'll trick the load balancer into directing your request towards the priority servers, but the server you end up hitting won't be happy that you're trying to scam faster access and will deny your request.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>userid</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The userid of this user on the system.  Not required for any other requests to
+the server, but some developers have wanted it.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>menus</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)List of menu items in order that should be in the LiveJournal web menu in the client application.
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>text</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+     The text of the menu item, or &quot;-&quot; for a separator. 
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>url</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+     The URL the menu item should launch, present for all menu items
+     except separators and submenus.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>sub</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(optional; multiple allowed)Same format as top-level menu structure
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ol></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ljp.csp.xml-rpc.protocol.html">Prev</a> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right"> <a accesskey="n" href="ljp.csp.xml-rpc.postevent.html">Next</a></td></tr><tr><td width="40%" align="left">XML-RPC Client/Server Protocol Reference </td><td width="20%" align="center"><a accesskey="u" href="ljp.csp.xml-rpc.protocol.html">Up</a></td><td width="40%" align="right"> postevent</td></tr></table></div></body></html>

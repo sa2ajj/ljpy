@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>getfriends</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.45"><link rel="home" href="index.html" title="LiveJournal Server"><link rel="up" href="ljp.csp.xml-rpc.protocol.html" title="XML-RPC Client/Server Protocol Reference"><link rel="previous" href="ljp.csp.xml-rpc.getevents.html" title="getevents"><link rel="next" href="ljp.csp.xml-rpc.friendof.html" title="friendof"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">getfriends</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ljp.csp.xml-rpc.getevents.html">Prev</a> </td><th width="60%" align="center">XML-RPC Client/Server Protocol Reference</th><td width="20%" align="right"> <a accesskey="n" href="ljp.csp.xml-rpc.friendof.html">Next</a></td></tr></table><hr></div><div class="refentry"><h1 class="title"><a name="ljp.csp.xml-rpc.getfriends"></a>getfriends</h1><div class="refnamediv"><h2>Name</h2><p>getfriends &#8212; 
+Returns a list of which other LiveJournal users this user lists as their friend.
+</p></div><div class="refsect1"><h2>Mode Description</h2><p>
+Returns a verbose list of information on friends a user has listed. Optionally able to include their friends of list, the friends group associated with each user, and a limit on the number of friends to return.
+</p></div><div class="refsect1"><h2>Arguments</h2><div class="orderedlist"><ol type="1"><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>username</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Username of user logging in.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>password</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Password of user logging in in plaintext.  Either this or &quot;hpassword&quot; must be present.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>hpassword</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    MD5 digest of user's password.  Not much more secure than password, but at least it's not in plain text.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>ver</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Protocol version supported by the client; assumed to be 0 if not specified. See <a href="ljp.csp.versions.html" title="Chapter 8. Protocol Versions">Chapter 8</a> for details on the protocol version
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>includefriendof</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If set to 1, you will also get back the info from the &quot;friendof&quot; mode. Some clients show friends and friendof data in separate tabs/panes. If you're always going to load both, then use this flag (as opposed to a tabbed dialog approach, where the user may not go to the second tab and thus would not need to load the friendof data.) friendof request variables can be used.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>includegroups</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If set to 1, you will also get back the info from the &quot;getfriendgroups&quot; mode. See above for the reason why this would be useful.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>friendlimit</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If set to a numeric value greater than zero, this mode will only return the number of results indicated. Useful only for building pretty lists for display which might have a button to view the full list nearby.
+</p></li></ul></div></p></li></ul></div></p></li></ol></div></div><div class="refsect1"><h2>Return Values</h2><div class="orderedlist"><ol type="1"><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>id</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The bit number for this friend group, from 1-30.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>name</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The name of this friend group.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>sortorder</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The sort integer for this friend group, from 0-255.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>public</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Either '0' or '1' for if this friend group is public.
+</p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>friendofs</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>username</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The username of the friend.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>fullname</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The full name of the friend.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>journaltype</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The type of journal the friend item is.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>fgcolor</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The foreground color of the friend item.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>bgcolor</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The background color of the friend item.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>groupmask</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If the group mask is not &quot;1&quot; (just bit 0 set), then this variable is returned with an 32-bit unsigned integer with a bit 0 always set, and bits 1-30 set for each group this friend is a part of. Bit 31 is reserved.
+</p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>friends</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[list]</i></span>(required)
+  Containing items:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>username</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The username of the friend.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>fullname</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The full name of the friend.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>journaltype</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The type of journal the friend item is.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>fgcolor</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The foreground color of the friend item.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>bgcolor</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The background color of the friend item.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>groupmask</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If the group mask is not &quot;1&quot; (just bit 0 set), then this variable is returned with an 32-bit unsigned integer with a bit 0 always set, and bits 1-30 set for each group this friend is a part of. Bit 31 is reserved.
+</p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ul></div></p></li></ol></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ljp.csp.xml-rpc.getevents.html">Prev</a> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right"> <a accesskey="n" href="ljp.csp.xml-rpc.friendof.html">Next</a></td></tr><tr><td width="40%" align="left">getevents </td><td width="20%" align="center"><a accesskey="u" href="ljp.csp.xml-rpc.protocol.html">Up</a></td><td width="40%" align="right"> friendof</td></tr></table></div></body></html>

@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>editevent</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.45"><link rel="home" href="index.html" title="LiveJournal Server"><link rel="up" href="ljp.csp.xml-rpc.protocol.html" title="XML-RPC Client/Server Protocol Reference"><link rel="previous" href="ljp.csp.xml-rpc.postevent.html" title="postevent"><link rel="next" href="ljp.csp.xml-rpc.editfriendgroups.html" title="editfriendgroups"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">editevent</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ljp.csp.xml-rpc.postevent.html">Prev</a> </td><th width="60%" align="center">XML-RPC Client/Server Protocol Reference</th><td width="20%" align="right"> <a accesskey="n" href="ljp.csp.xml-rpc.editfriendgroups.html">Next</a></td></tr></table><hr></div><div class="refentry"><h1 class="title"><a name="ljp.csp.xml-rpc.editevent"></a>editevent</h1><div class="refnamediv"><h2>Name</h2><p>editevent &#8212; 
+Edit or delete a user's past journal entry
+</p></div><div class="refsect1"><h2>Mode Description</h2><p>
+Modify an already created event. If fields are empty, it will delete the event.
+</p></div><div class="refsect1"><h2>Arguments</h2><div class="orderedlist"><ol type="1"><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>username</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Username of user logging in.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>password</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Password of user logging in in plaintext.  Either this or &quot;hpassword&quot; must be present.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>hpassword</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    MD5 digest of user's password.  Not much more secure than password, but at least it's not in plain text.
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>ver</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+    Protocol version supported by the client; assumed to be 0 if not specified. See <a href="ljp.csp.versions.html" title="Chapter 8. Protocol Versions">Chapter 8</a> for details on the protocol version
+  </p></li></ul></div></p></li><li><p><span class="bold"><b>itemid</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The unique ItemID of the item being modified or deleted.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>event</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The revised event/log text the user is submitting. Or, to delete an entry, just send no text at all. Carriage returns are okay (0x0A, 0x0A0D, or 0x0D0A), although 0x0D are removed internally to make everything into Unix-style line-endings (just \ns). Posts may also contain HTML, but be aware that the LiveJournal server converts newlines to HTML &lt;BR&gt;s when displaying them, so your client should not try to insert these itself.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>lineendings</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Specifies the type of line-endings you're using. Possible values are unix (0x0A (\n)), pc (0x0D0A (\r\n)), or mac (
+0x0D (\r) ). The default is not-Mac. Internally, LiveJournal stores all text as Unix-form
+atted text, and it does the conversion by removing all \r characters. If you're sending a
+ multi-line event on Mac, you have to be sure and send a lineendings value of mac  or you
+r line endings will be removed. PC and Unix clients can ignore this setting, or you can s
+end it. It may be used for something more in the future.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>subject</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The subject for this post. Limited to 255 characters. No newlines.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>security</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Specifies who can read this post. Valid values are public (default), private and usemask. When value is usemask, viewability is controlled by the allowmask.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>allowmask</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+Relevant when security is usemask. A 32-bit unsigned integer representing which of the user's groups of friends are allowed to view this post. Turn bit 0 on to allow any defined friend to read it. Otherwise, turn bit 1-30 on for every friend group that should be allowed to read it. Bit 31 is reserved.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>props</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[struct]</i></span>(optional; multiple allowed)
+Containing keys:
+  <div class="itemizedlist"><ul></ul></div></p></li></ul></div></p></li><li><p><span class="bold"><b>usejournal</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If editing a shared journal entry, include this key and the username you wish to edit the entry in. By default, you edit the entry as if it were in user &quot;user&quot;'s journal, as specified above.
+</p></li></ul></div></p></li><li><p><span class="bold"><b>year</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If modifying only, the 4-digit year of the event (from the user's local timezone).
+</p></li></ul></div></p></li><li><p><span class="bold"><b>mon</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If modifying only, the 1- or 2-digit month of the event (from the user's local timezone).
+</p></li></ul></div></p></li><li><p><span class="bold"><b>day</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If modifying only, the 1- or 2-digit day of the month of the event (from the user's local timezone).
+</p></li></ul></div></p></li><li><p><span class="bold"><b>hour</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If modifying only, the 1- or 2-digit hour from 0 to 23 of the event (from the user's local timezone).
+</p></li></ul></div></p></li><li><p><span class="bold"><b>min</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+If modifying only, the 1- or 2-digit minute of the event (from the user's local timezone).
+</p></li></ul></div></p></li></ul></div></p></li></ol></div></div><div class="refsect1"><h2>Return Values</h2><div class="orderedlist"><ol type="1"><li><p><span class="emphasis"><i>[struct]</i></span>(required)
+Containing keys:
+  <div class="itemizedlist"><ul><li><p><span class="bold"><b>itemid</b></span>:
+  <div class="itemizedlist"><ul><li><p><span class="emphasis"><i>[scalar]</i></span>(required)
+The unique ItemID of the item being modified or deleted.
+</p></li></ul></div></p></li></ul></div></p></li></ol></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ljp.csp.xml-rpc.postevent.html">Prev</a> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right"> <a accesskey="n" href="ljp.csp.xml-rpc.editfriendgroups.html">Next</a></td></tr><tr><td width="40%" align="left">postevent </td><td width="20%" align="center"><a accesskey="u" href="ljp.csp.xml-rpc.protocol.html">Up</a></td><td width="40%" align="right"> editfriendgroups</td></tr></table></div></body></html>
