@@ -156,7 +156,7 @@ class LiveJournal:
 
             if security is None:
                 args.security = 'public'
-            elif security == 'private':
+            elif security in [ 'public', 'private' ]:
                 args.security = security
             elif security == 'friends':
                 args.security = 'usemask'
@@ -176,13 +176,46 @@ class LiveJournal:
 
         return result
 
-    def editevent (self):
+    def editevent (self, id, event, date = None, subject = None, usejournal = None, security = None, when = None, props = None):
         '''editevent - Edit or delete a user's past journal entry
 
         Modify an already created event. If fields are empty, it will delete
         the event.'''
 
-        pass
+        if self.user is not None:
+            assert type (event) == UnicodeType
+            assert subject is None or type (subject) == UnicodeType
+
+            args = self._required_headers (itemid = id, event = event.encode ('utf-8'))
+
+            if date is not None:
+                args.year, args.mon, args.day, args.hour, args.min = getdate (date)
+
+            if subject is not None:
+                args.subject = subject.encode ('utf-8')
+
+            if usejournal is not None:
+                args.usejournal = usejournal
+
+            if security is None:
+                args.security = 'public'
+            elif security in [ 'public', 'private' ]:
+                args.security = security
+            elif security == 'friends':
+                args.security = 'usemask'
+                args.allowmask = 1
+            else:
+                args.security = 'usemask'
+                args.allowmask = security
+
+            if type (props) is DictType:
+                args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
+
+            result = self._do_request ('editevent', args)
+        else:
+            result = None
+
+        return result
 
     def editfriendgroups (self):
         '''editfriendgroups - Edit the user's defined groups of friends.
