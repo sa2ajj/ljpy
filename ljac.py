@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 from os.path import expanduser
+import readline
 
 from livejournal import LiveJournal
 from config import Config
@@ -33,4 +34,30 @@ def execute (commands):
         for t, l in item.output:
             print '%3.3s: %s' % (t, l)
 
-execute (['friend list'])
+# execute (['friend list'])
+while 1:
+    commands = []
+    ps = '$ '
+
+    while 1:
+        try:
+            l = raw_input (ps)
+        except EOFError:
+            commands = None
+            break
+
+        if l == ';':
+            break
+
+        if l[-1] == ';':
+            commands.append (l[:-1])
+            break
+
+        commands.append (l)
+        ps = '> '
+
+    if commands is not None:
+        execute (commands)
+    else:
+        print '\nQuitting...'
+        break
