@@ -112,8 +112,10 @@ class LiveJournal:
 
         # assert selecttype in [ 'day', 'lastn', 'one', 'syncitems']
 
-    def _getevents (self, what):
+    def _getevents (self, args):
         '''helper function to process what getevents returned'''
+
+        what = self.lj.LJ.XMLRPC.getevents (args)
 
         result = []
 
@@ -130,25 +132,24 @@ class LiveJournal:
 
         return result
 
-    def getevents_day (self, day = None, month = None, year = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+    def getevents_last (self, howmany = 20, before = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
         if self.user is not None:
-            result = None
+            args = mdict (username = self.user,
+                hpassword = md5 (self.password).hexdigest (),
+                ver = 1,
+                clientversion = self.clientversion,
+                selecttype = 'lastn',
+                howmany = howmany)))
+
+            result = self._getevents (args)
         else:
             result = None
 
         return result
 
-    def getevents_last (self, howmany = 20, before = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+    def getevents_day (self, day = None, month = None, year = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
         if self.user is not None:
-            args = mdict
-
-            return self._getevents (self.lj.LJ.XMLRPC.getevents (mdict (username = self.user,
-                hpassword = md5 (self.password).hexdigest (),
-                ver = 1,
-                clientversion = self.clientversion,
-                selecttype = 'lastn',
-                howmany = howmany
-                )))
+            result = None
         else:
             result = None
 
