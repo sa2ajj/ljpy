@@ -3,8 +3,7 @@
 from os.path import expanduser
 import readline
 
-from livejournal import LiveJournal
-from config import Config
+from livejournal import LiveJournal, Config
 
 config = Config ()
 config.load ('lj.conf')
