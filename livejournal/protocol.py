@@ -40,9 +40,14 @@ class LiveJournal:
         self.user = None
         self.password = None
 
+    def _do_request (self, mode, args):
+        method = getattr (self.lj.LJ.XMLRPC, mode)
+
+        return method (args)
+
     def login (self, user, password):
         try:
-            result = self.lj.LJ.XMLRPC.login (mdict (username = user,
+            result = self._do_request ('login', mdict (username = user,
                 # password = password,
                 hpassword = md5 (password).hexdigest (),
                 ver = 1,
@@ -94,7 +99,7 @@ class LiveJournal:
             if type (props) is DictType:
                 args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
 
-            result = self.lj.LJ.XMLRPC.postevent (args.__dict__)
+            result = self._do_request ('postevent', args.__dict__)
         else:
             result = None
 
@@ -115,7 +120,7 @@ class LiveJournal:
     def _getevents (self, args):
         '''helper function to process what getevents returned'''
 
-        what = self.lj.LJ.XMLRPC.getevents (args.__dict__)
+        what = self._do_request ('getevents', args.__dict__)
 
         result = []
 
@@ -182,9 +187,7 @@ class LiveJournal:
             if friendlimit is not None:
                 args.friendlimit = friendlimit
 
-            pprint (args.__dict__)
-
-            result = self.lj.LJ.XMLRPC.getfriends (args.__dict__)
+            result = self._do_request ('getfriends', args.__dict__)
         else:
             result = None
 
@@ -204,13 +207,12 @@ class LiveJournal:
 
     def checkfriends (self, lastupdate = '', mask = 0):
         if self.user is not None:
-            result = dictm (self.lj.LJ.XMLRPC.checkfriends (mdict (username = self.user,
+            result = dictm (self._do_request ('checkfriends', mdict (username = self.user,
                 hpassword = md5 (self.password).hexdigest (),
                 ver = 1,
                 clientversion = self.clientversion,
                 lastupdate = lastupdate,
-                mask = mask
-                )))
+                mask = mask)))
         else:
             result = None
 
