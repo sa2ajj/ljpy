@@ -3,23 +3,18 @@
 from os.path import expanduser
 
 from livejournal import LiveJournal
+from config import Config
 
-if 1:
-    user = 'mss'
-    password = 'rogazzi'
-elif 0:
-    user = 'test'
-    password = 'test'
-else:
-    user, password = 'leftaw', 'none'
+config = Config ()
+config.load ('lj.conf')
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 from pprint import pprint
 
-pprint (lj.login (user, password))
+pprint (lj.login (config.username, config.password))
 
 if 0:
     pprint (lj.checkfriends (lastupdate = '2002-07-24 00:00:00', mask = 1))
 else:
-    pprint (lj.getevents_last ())
+    pprint (lj.getfriends (includefriendof = 1, includegroups = 1))
