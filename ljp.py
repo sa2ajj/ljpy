@@ -16,15 +16,16 @@ from livejournal import LiveJournal, list2mask, Config, evalue
 lang, enc = getdefaultlocale ()
 
 parser = OptionParser ()
+
+parser.add_option ('-C', '--config', type='string', dest='config', default = None,
+                   help = 'specify config file',
+                   metavar = 'CONFIG')
 parser.add_option ('-u', '--username', type='string', dest='username', default = None,
                    help = 'specify username, otherwise the one from the configuration file is used',
                    metavar = 'USER')
 parser.add_option ('-p', '--password', type='string', dest='password', default = None,
                    help = 'specify password, otherwise the one from the configuration file is used',
                    metavar = 'PASSWORD')
-parser.add_option ('-C', '--config', type='string', dest='config', default = None,
-                   help = 'specify config file',
-                   metavar = 'CONFIG')
 parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
                    help = 'specify character encoding',
                    metavar = 'ENCODING')
@@ -87,9 +88,15 @@ if username is None or password is None:
     print "You must provide both user name and password"
     sys.exit (2)
 
+usejournal = evalue (None, options.journal)
+
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 info = lj.login (username, password)
-entry = lj.postevent (event, subject = subject, props = props, security = list2mask (options.security, info.friendgroups))
+entry = lj.postevent (event,
+                usejournal = usejournal,
+                subject = subject,
+                props = props,
+                security = list2mask (options.security, info.friendgroups))
 
-print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (server.username, entry.itemid*256 + entry.anum)
+print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (usejournal or server.username, entry.itemid*256 + entry.anum)
