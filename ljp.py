@@ -88,4 +88,4 @@ lj = LiveJournal ('Python-ljpy/0.0.1')
 info = lj.login (config.username, config.password)
 entry = lj.postevent (event, subject = subject, props = props, security = s2s (options.security, info.friendgroups))
 
-print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (config.username, event.itemid*256 + event.anum)
+print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (config.username, entry.itemid*256 + entry.anum)
