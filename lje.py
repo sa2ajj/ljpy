@@ -11,7 +11,7 @@ from livejournal.edit import do_edit
 
 lang, enc = getdefaultlocale ()
 
-parser = std_parser (usage = 'Usage: %prog [options] [message text with spaces]')
+parser = std_parser (usage = '%prog [options] [message text with spaces]')
 
 parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
                    help = 'specify character encoding',

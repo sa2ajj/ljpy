@@ -3,7 +3,7 @@
 from livejournal import LiveJournal, Config, evalue, list2mask
 from livejournal.config import std_parser
 
-parser = std_parser (usage = 'Usage: %prog [options]')
+parser = std_parser (usage = '%prog [options]')
 
 parser.add_option ('-F', '--from',
                    action = 'store', type = 'string', dest = 'sfrom', default = 'public',
