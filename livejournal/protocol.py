@@ -243,6 +243,13 @@ class LiveJournal:
         pass
 
     def getfriends (self, includefriendof = None, includegroups = None, friendlimit = None):
+        '''getfriends - Returns a list of which other LiveJournal users this user lists as their friend.
+
+        Returns a verbose list of information on friends a user has listed.
+        Optionally able to include their friends of list, the friends group
+        associated with each user, and a limit on the number of friends to
+        return.'''
+
         if self.user is not None:
             args = self._required_headers ()
 
