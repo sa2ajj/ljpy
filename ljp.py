@@ -11,20 +11,14 @@ except ImportError:
     sys.exit (1)
 
 from livejournal import LiveJournal, list2list, list2mask, Config, evalue
+from livejournal.config add_std_options
 
 lang, defaultenc = getdefaultlocale ()
 
 parser = OptionParser (usage = 'Usage: %prog [options] [message text with spaces]')
 
-parser.add_option ('-C', '--config', type='string', dest='config', default = None,
-                   help = 'specify config file',
-                   metavar = 'CONFIG')
-parser.add_option ('-u', '--username', type='string', dest='username', default = None,
-                   help = 'specify username, otherwise the one from the configuration file is used',
-                   metavar = 'USER')
-parser.add_option ('-p', '--password', type='string', dest='password', default = None,
-                   help = 'specify password, otherwise the one from the configuration file is used',
-                   metavar = 'PASSWORD')
+add_std_options (parser)
+
 parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
                    help = 'specify character encoding',
                    metavar = 'ENCODING')

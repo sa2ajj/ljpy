@@ -72,3 +72,18 @@ class ConfigSection:
             self.__dict__[name] = value
         else:
             self._config.set (self._section, name, value)
+
+def add_std_options (parser):
+    '''adds to the specified parser "standard" options
+    
+unfortunately, this function has purely side effect (which I, personally, do not like'''
+
+    parser.add_option ('-C', '--config', type='string', dest='config', default = None,
+                    help = 'specify a config file',
+                    metavar = 'CONFIG')
+    parser.add_option ('-u', '--username', type='string', dest='username', default = None,
+                    help = 'specify username, otherwise the one from the configuration file is used',
+                    metavar = 'USER')
+    parser.add_option ('-p', '--password', type='string', dest='password', default = None,
+                    help = 'specify password, otherwise the one from the configuration file is used',
+                    metavar = 'PASSWORD')
