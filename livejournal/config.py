@@ -1,4 +1,4 @@
-# Copyright (C) 2002 by Mikhail Sobolev <mss@mawhrin.net>
+# Copyright (C) 2002, 2003 by Mikhail Sobolev <mss@mawhrin.net>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 from ConfigParser import ConfigParser, NoOptionError
 from os.path import expanduser
+from cStringIO import StringIO
 
 def evalue (*values):
     '''find an effective value'''
@@ -38,6 +39,11 @@ class Config:
     def load (self, name):
         self._cp = ConfigParser ()
         self._cp.read (expanduser (name))
+
+    def as_string (self):
+        s = StringIO ()
+        self._cp.write (s)
+        return s.getvalue ()
 
     def __hasattr__ (self, name):
         return self._cp.has_section (name)
@@ -87,3 +93,16 @@ unfortunately, this function has purely side effect (which I, personally, do not
     parser.add_option ('-p', '--password', type='string', dest='password', default = None,
                     help = 'specify password, otherwise the one from the configuration file is used',
                     metavar = 'PASSWORD')
+
+def std_parser (usage = None):
+    try:
+        from optik import OptionParser
+    except ImportError:
+        printf >> sys.stderr, "Optik module is really required for this program to work"
+        sys.exit (1)
+
+    parser = OptionParser (usage)
+
+    add_std_options (parser)
+
+    return parser
