@@ -96,6 +96,10 @@ class LiveJournal:
 
         return result
 
+    def _logged_in (self):
+        if self.user is None:
+            raise LJError ('Must be logged in')
+
     def _required_headers (self, **other):
         args = dictm (ver = 1, clientversion = self.clientversion, **other)
 
@@ -142,37 +146,36 @@ class LiveJournal:
         security or meta data, will create a new entry. Will return the itemid
         of the new post.'''
 
-        if self.user is not None:
-            assert type (event) == UnicodeType
-            assert subject is None or type (subject) == UnicodeType
+        self._logged_in ()
 
-            args = self._required_headers (event = event.encode ('utf-8'))
+        assert type (event) == UnicodeType
+        assert subject is None or type (subject) == UnicodeType
 
-            if subject is not None:
-                args.subject = subject.encode ('utf-8')
+        args = self._required_headers (event = event.encode ('utf-8'))
 
-            if usejournal is not None:
-                args.usejournal = usejournal
+        if subject is not None:
+            args.subject = subject.encode ('utf-8')
 
-            if security is None:
-                args.security = 'public'
-            elif security in [ 'public', 'private' ]:
-                args.security = security
-            elif security == 'friends':
-                args.security = 'usemask'
-                args.allowmask = 1
-            else:
-                args.security = 'usemask'
-                args.allowmask = security
+        if usejournal is not None:
+            args.usejournal = usejournal
 
-            args.year, args.mon, args.day, args.hour, args.min = getdate (when)
-
-            if type (props) is DictType:
-                args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
-
-            result = self._do_request ('postevent', args)
+        if security is None:
+            args.security = 'public'
+        elif security in [ 'public', 'private' ]:
+            args.security = security
+        elif security == 'friends':
+            args.security = 'usemask'
+            args.allowmask = 1
         else:
-            result = None
+            args.security = 'usemask'
+            args.allowmask = security
+
+        args.year, args.mon, args.day, args.hour, args.min = getdate (when)
+
+        if type (props) is DictType:
+            args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
+
+        result = self._do_request ('postevent', args)
 
         return result
 
@@ -182,38 +185,37 @@ class LiveJournal:
         Modify an already created event. If fields are empty, it will delete
         the event.'''
 
-        if self.user is not None:
-            assert type (event) == UnicodeType
-            assert subject is None or type (subject) == UnicodeType
+        self._logged_in ()
 
-            args = self._required_headers (itemid = id, event = event.encode ('utf-8'))
+        assert type (event) == UnicodeType
+        assert subject is None or type (subject) == UnicodeType
 
-            if date is not None:
-                args.year, args.mon, args.day, args.hour, args.min = getdate (date)
+        args = self._required_headers (itemid = id, event = event.encode ('utf-8'))
 
-            if subject is not None:
-                args.subject = subject.encode ('utf-8')
+        if date is not None:
+            args.year, args.mon, args.day, args.hour, args.min = getdate (date)
 
-            if usejournal is not None:
-                args.usejournal = usejournal
+        if subject is not None:
+            args.subject = subject.encode ('utf-8')
 
-            if security is None:
-                args.security = 'public'
-            elif security in [ 'public', 'private' ]:
-                args.security = security
-            elif security == 'friends':
-                args.security = 'usemask'
-                args.allowmask = 1
-            else:
-                args.security = 'usemask'
-                args.allowmask = security
+        if usejournal is not None:
+            args.usejournal = usejournal
 
-            if type (props) is DictType:
-                args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
-
-            result = self._do_request ('editevent', args)
+        if security is None:
+            args.security = 'public'
+        elif security in [ 'public', 'private' ]:
+            args.security = security
+        elif security == 'friends':
+            args.security = 'usemask'
+            args.allowmask = 1
         else:
-            result = None
+            args.security = 'usemask'
+            args.allowmask = security
+
+        if type (props) is DictType:
+            args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
+
+        result = self._do_request ('editevent', args)
 
         return result
 
@@ -223,6 +225,8 @@ class LiveJournal:
         Given several optional lists, will add/delete/update/rename the friends
         groups for a user.'''
 
+        self._logged_in ()
+
         pass
 
     def editfriends (self):
@@ -231,6 +235,8 @@ class LiveJournal:
         Takes up to two lists, one of friends to delete and one of friends to add.
         Several options are allowed to be specified when adding a friend. It
         returns a verbose list of the friends added, if any were.'''
+
+        self._logged_in ()
 
         pass
 
@@ -258,33 +264,35 @@ class LiveJournal:
         return result
 
     def getevents_last (self, howmany = 20, beforedate = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
-        if self.user is not None:
-            # mss: i am not sure that this assert is a really good idea: lj
-            # should return an error anyway.
-            assert howmany <= 50
-            args = self._required_headers (selecttype = 'lastn', howmany = howmany)
+        self._logged_in ()
 
-            if beforedate is not None:
-                args.beforedate = beforedate
+        # mss: i am not sure that this assert is a really good idea: lj
+        # should return an error anyway.
+        assert howmany <= 50
+        args = self._required_headers (selecttype = 'lastn', howmany = howmany)
 
-            result = self._getevents (args)
-        else:
-            result = None
+        if beforedate is not None:
+            args.beforedate = beforedate
+
+        result = self._getevents (args)
 
         return result
 
     def getevents_day (self, day = None, month = None, year = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
-        if self.user is not None:
-            result = None
-        else:
-            result = None
+        self._logged_in ()
+
+        result = None
 
         return result
 
     def getevent (self, id, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+        self._logged_in ()
+
         pass
 
     def getevents_sync (self, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+        self._logged_in ()
+
         pass
 
     def getfriends (self, includefriendof = None, includegroups = None, friendlimit = None):
@@ -295,38 +303,37 @@ class LiveJournal:
         associated with each user, and a limit on the number of friends to
         return.'''
 
-        if self.user is not None:
-            args = self._required_headers ()
+        self._logged_in ()
 
-            if includegroups is not None and includegroups:
-                args.includegroups = 1
+        args = self._required_headers ()
 
-            if includefriendof is not None and includefriendof:
-                args.includefriendof = 1
+        if includegroups is not None and includegroups:
+            args.includegroups = 1
 
-            if friendlimit is not None:
-                args.friendlimit = friendlimit
+        if includefriendof is not None and includefriendof:
+            args.includefriendof = 1
 
-            result = self._do_request ('getfriends', args)
+        if friendlimit is not None:
+            args.friendlimit = friendlimit
 
-            if result.has_key ('friends'):
-                friends = listofdict (result['friends'])
-            else:
-                friends = None
+        result = self._do_request ('getfriends', args)
 
-            if result.has_key ('friendofs'):
-                friendofs = listofdict (result['friendofs'])
-            else:
-                friendofs = None
-
-            if result.has_key ('friendgroups'):
-                friendgroups = listofdict (result['friendgroups'])
-            else:
-                friendgroups = None
-
-            result = friends, friendofs, friendgroups
+        if result.has_key ('friends'):
+            friends = listofdict (result['friends'])
         else:
-            result = None
+            friends = None
+
+        if result.has_key ('friendofs'):
+            friendofs = listofdict (result['friendofs'])
+        else:
+            friendofs = None
+
+        if result.has_key ('friendgroups'):
+            friendgroups = listofdict (result['friendgroups'])
+        else:
+            friendgroups = None
+
+        result = friends, friendofs, friendgroups
 
         return result
 
@@ -336,12 +343,16 @@ class LiveJournal:
         Returns a "friends of" list for a specified user. An optional limit of
         returned friends can be supplied.'''
 
+        self._logged_in ()
+
         pass
 
     def getfriendgroups (self):
         '''getfriendgroups - Retrieves a list of the user's defined groups of friends.
 
         Retrieves a list of the user's defined groups of friends.'''
+
+        self._logged_in ()
 
         pass
 
@@ -352,15 +363,14 @@ class LiveJournal:
         populating calendar widgets in GUI clients. Optionally a journal can be
         specified. It returns a list of the dates and accompanied counts.'''
 
-        if self.user is not None:
-            args = self._required_headers ()
+        self._logged_in ()
 
-            if usejournal is not None:
-                args.usejournal = usejournal
+        args = self._required_headers ()
 
-            result = self._do_request ('getdaycounts', args)
-        else:
-            result = None
+        if usejournal is not None:
+            args.usejournal = usejournal
+
+        result = self._do_request ('getdaycounts', args)
 
         return result
 
@@ -375,15 +385,14 @@ class LiveJournal:
         entries (type "L"), use the getevents mode with a selecttype of
         "syncitems".'''
 
-        if self.user is not None:
-            args = self._required_headers ()
+        self._logged_in ()
 
-            if lastsync is not None:
-                args.lastsync = lastsync
+        args = self._required_headers ()
 
-            result = dictm (**self._do_request ('syncitems', args))
-        else:
-            result = None
+        if lastsync is not None:
+            args.lastsync = lastsync
+
+        result = dictm (**self._do_request ('syncitems', args))
 
         return result
 
@@ -396,12 +405,11 @@ class LiveJournal:
         rather than pounding on reload in their browser, which is stressful on
         the serves.'''
 
-        if self.user is not None:
-            args = self._required_headers (lastupdate = lastupdate, mask = mask)
+        self._logged_in ()
 
-            result = dictm (**self._do_request ('checkfriends', args))
-        else:
-            result = None
+        args = self._required_headers (lastupdate = lastupdate, mask = mask)
+
+        result = dictm (**self._do_request ('checkfriends', args))
 
         return result
 
@@ -412,12 +420,11 @@ class LiveJournal:
         console where less-often used commands can be entered. There's a web
         interface to this shell online, and this is another gateway to that.'''
 
-        if self.user is not None:
-            args = self._required_headers (commands = commands)
+        self._logged_in ()
 
-            result = self._do_request ('consolecommand', args).get ('results', None)
-        else:
-            result = None
+        args = self._required_headers (commands = commands)
+
+        result = self._do_request ('consolecommand', args).get ('results', None)
 
         return result
 
