@@ -8,6 +8,29 @@ from optik import OptionParser
 from livejournal import LiveJournal, mdict
 from config import Config
 
+specials = [ 'public', 'private', 'friends' ]
+
+def s2s (arg, groups):
+    gg = map (lambda x : x.lower (), arg.split (','))
+
+    for special in specials:
+        if special in gg:
+            gg = special
+            break
+
+    if gg in specials:
+        security = gg
+    else:
+        mask = 0
+
+        for group in groups:
+            if group.name in gg:
+                mask |= (1 << group.id)
+
+        security = str (mask)
+
+    return security
+
 parser = OptionParser ()
 parser.add_option ('-s', '--subject',
                    action = 'store', type = 'string', dest = 'subject', default = None,
@@ -21,6 +44,10 @@ parser.add_option ('-M', '--music',
                    action = 'store', type = 'string', dest = 'music', default = None,
                    help = 'tell them what music you are listening to',
                    metavar = 'MUSIC')
+parser.add_option ('-S', '--security',
+                   action = 'store', type = 'string', dest = 'security', default = 'public',
+                   help = 'restrict access to the item',
+                   metavar = 'SECURITY')
 
 options, args = parser.parse_args ()
 
@@ -36,7 +63,10 @@ if options.subject is not None:
 else:
     subject = None
 
-props = { 'opt_preformatted' : 1 }
+if 0:
+    props = { 'opt_preformatted' : 1 }
+else:
+    props = { }
 
 if options.mood is not None:
     props['current_mood'] = options.mood
@@ -56,4 +86,4 @@ config.load ('lj.conf')
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
 lj.login (config.username, config.password)
-print lj.postevent (event, subject = subject, props = props)
+print lj.postevent (event, subject = subject, props = props, security = s2s (options.security))
