@@ -85,5 +85,5 @@ config.load ('lj.conf')
 
 lj = LiveJournal ('Python-ljpy/0.0.1')
 
-lj.login (config.username, config.password)
-print lj.postevent (event, subject = subject, props = props, security = s2s (options.security))
+info = lj.login (config.username, config.password)
+print lj.postevent (event, subject = subject, props = props, security = s2s (options.security, info.friendgroups))
