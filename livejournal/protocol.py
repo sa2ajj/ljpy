@@ -26,7 +26,9 @@ from xmlrpclib import Server, Binary, binary, Fault
 from md5 import md5
 from types import StringType, UnicodeType, DictType
 import re
-from time import time, localtime
+from time import time, localtime, asctime
+
+from pprint import PrettyPrinter
 
 __version__ = '$Revision$'
 __date__ = '$Date$'
@@ -542,3 +544,49 @@ class Moods:
     def __init__ (self):
         self._moods = {}
         self.children = {}
+
+class Config:
+    valid_params = [ 'username', 'password' ]
+
+    def __init__ (self, **kw):
+        self.update (kw)
+
+    def update (self, what):
+        for k, v in what.items ():
+            setattr (self, k, v)
+
+    def __setattr__ (self, name, value):
+        if name not in self.valid_params:
+            raise KeyError, 'invalid key: %s' % name
+
+        self.__dict__[name] = value
+
+    def load (self, name):
+        tempo = {}
+
+        try:
+            tempo = {}
+            execfile (name, tempo)
+        except IOError, exc:
+            if exc.filename is None:    # arg! execfile() loses filename
+                exc.filename = name
+            raise exc
+
+        for name in self.valid_params:
+            if tempo.has_key (name):
+                setattr (self, name, tempo[name])
+
+    def save (self, name):
+        output = open (name + '.new', 'w')
+
+        output.write ('# This file was automagically generated on: %s\n\n' % asctime ())
+
+        names = self.__dict__.keys ()
+        names.sort ()
+
+        pp = PrettyPrinter (stream = output, indent = 2)
+
+        for name in names:
+            output.write ('%s = ' % name)
+            pp.pprint (getattr (self, name))
+            output.write ('\n')
