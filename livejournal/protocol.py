@@ -2,7 +2,7 @@
 
 from xmlrpclib import Server, Binary, binary, Fault
 from md5 import md5
-from types import StringType, UnicodeType
+from types import StringType, UnicodeType, DictType
 import re
 from time import time, localtime
 
@@ -46,12 +46,15 @@ class LiveJournal:
 
     def postevent (self, subject, event, usejournal = None, security = None, when = None, props = None):
         if self.user is not None:
+            assert type (event) == UnicodeType
+            assert type (subject) == UnicodeType
+
             args = dictm (username = self.user,
                 hpassword = md5 (self.password).hexdigest (),
                 ver = 1,
                 clientversion = self.clientversion,
-                event = binary (event.encode ('utf-8')),
-                subject = binary (subject.encode ('utf-8')))
+                event = event.encode ('utf-8'),
+                subject = subject.encode ('utf-8'))
 
             if usejournal is not None:
                 args.usejournal = usejournal
@@ -68,11 +71,10 @@ class LiveJournal:
                 args.allowmask = security
 
             if when is None:
-                args.year, args.month, args.day, args.hour, args.minute, args.second, dummy, dummy, dummy = localtime (time ())
+                args.year, args.mon, args.day, args.hour, args.min, dummy, dummy, dummy, dummy = localtime (time ())
 
-            args.props = { 'current_mood' : 'testing', 'current_music' : 'silence' }
-
-            pprint (args.__dict__)
+            if type (props) is DictType:
+                args.props = props
 
             result = self.lj.LJ.XMLRPC.postevent (args.__dict__)
         else:
@@ -108,7 +110,7 @@ class LiveJournal:
                 else:
                     item[k] = v
 
-            result.append (item)
+            result.append (dictm (**item))
 
         return result
 
