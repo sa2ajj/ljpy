@@ -18,6 +18,6 @@
 
 __all__ = [ 'LiveJournal', 'LJError', 'Config', 'evalue']
 
-from livejournal.livejournal import LiveJournal, LJError
+from livejournal.livejournal import LiveJournal, LJError, getdate
 from livejournal.config import Config, evalue
 from utils import list2list, list2mask
