@@ -468,9 +468,9 @@ class LiveJournal:
 
         args = self._required_headers (commands = commands)
 
-        result = self._do_request ('consolecommand', args).get ('results', None)
+        result = self._do_request ('consolecommand', args).get ('results', [])
 
-        return listofrecords (result['results'])
+        return listofrecords (result)
 
 class Moods:
     '''Helper class to deal with moods.'''
