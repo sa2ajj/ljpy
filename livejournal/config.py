@@ -17,6 +17,7 @@
 # this file contains all stuff related to configuration files
 
 from ConfigParser import ConfigParser, NoOptionError
+from os.path import expanduser
 
 def evalue (*values):
     '''find an effective value'''
@@ -36,7 +37,7 @@ class Config:
 
     def load (self, name):
         self._cp = ConfigParser ()
-        self._cp.read (os.path.expanduser (name))
+        self._cp.read (expanduser (name))
 
     def __hasattr__ (self, name):
         return self._cp.has_section (name)
