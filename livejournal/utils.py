@@ -18,6 +18,11 @@
 
 import re
 
+_version = re.compile (r'')
+
+def valid_version (what):
+    return _version.match (what) is not None
+
 _spaces = re.compile (r'\s*,\s*')
 
 def list2list (arg):
@@ -45,3 +50,21 @@ def list2mask (arg, groups):
         security = str (mask)
 
     return security
+
+def mask2list (arg, groups):
+    if arg in l2m_specials:
+        result = [ arg ]        # actually, 'friends' does not exist
+    else:
+        try:
+            mask = int (arg)
+        except ValueError:
+            mask = None
+        
+        if mask is None:
+            result = None
+        elif mask == 1:
+            result = [ 'friends' ]
+        else:
+            pass
+
+    return result
