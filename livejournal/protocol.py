@@ -362,6 +362,16 @@ class LiveJournal:
             for k, v in entry.items ():
                 if isinstance (v, Binary):
                     item[k] = v.data
+                elif type (v) == DictType:
+                    tempo = {}
+
+                    for name, value in v.items ():
+                        if isinstance (value, Binary):
+                            tempo[name] = value.data
+                        else:
+                            tempo[name] = value
+
+                    item[k] = tempo
                 else:
                     item[k] = v
 
