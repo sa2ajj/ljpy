@@ -55,6 +55,9 @@ def getdate (when = None):
 def listofdict (what):
     return map (lambda x, m = dictm : m (**x), what)
 
+class LJError (Exception):
+    pass
+
 class LiveJournal:
     '''Main interface class
 
@@ -82,7 +85,14 @@ class LiveJournal:
     def _do_request (self, mode, args):
         method = getattr (self.lj.LJ.XMLRPC, mode)
 
-        return method (args)
+        if isinstance (args, dictm):
+            result = method (args.__dict__)
+        elif type (args) == DictType:
+            result = method (args)
+        else:
+            raise LJError ('invalid argument for _do_request: must be either an instance of dictm or a dictionary')
+
+        return result
 
     def _required_headers (self, **other):
         args = dictm (ver = 1, clientversion = self.clientversion, **other)
@@ -107,7 +117,7 @@ class LiveJournal:
 
             args = self._required_headers (username = user, hpassword = hpassword, getmoods = 134, getpickws = 1, getpickwurls = 1)
 
-            result = self._do_request ('login', args.__dict__)
+            result = self._do_request ('login', args)
 
             self.user = user
             self.hpassword = hpassword
@@ -158,7 +168,7 @@ class LiveJournal:
             if type (props) is DictType:
                 args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
 
-            result = self._do_request ('postevent', args.__dict__)
+            result = self._do_request ('postevent', args)
         else:
             result = None
 
@@ -195,7 +205,7 @@ class LiveJournal:
     def _getevents (self, args):
         '''helper function to process what getevents returned'''
 
-        what = self._do_request ('getevents', args.__dict__)
+        what = self._do_request ('getevents', args)
 
         result = []
 
@@ -262,7 +272,7 @@ class LiveJournal:
             if friendlimit is not None:
                 args.friendlimit = friendlimit
 
-            result = self._do_request ('getfriends', args.__dict__)
+            result = self._do_request ('getfriends', args)
 
             if result.has_key ('friends'):
                 friends = listofdict (result['friends'])
@@ -309,7 +319,7 @@ class LiveJournal:
 
         pass
 
-    def syncitems (self):
+    def syncitems (self, lastsync = None):
         '''syncitems - Returns a list of all the items that have been created or updated for a user.
 
         Returns a list (or part of a list) of all the items (journal entries,
@@ -320,7 +330,17 @@ class LiveJournal:
         entries (type "L"), use the getevents mode with a selecttype of
         "syncitems".'''
 
-        pass
+        if self.user is not None:
+            args = self._required_headers ()
+
+            if lastsync is not None:
+                args.lastsync = lastsync
+
+            result = dictm (**self._do_request ('syncitems', args))
+        else:
+            result = None
+
+        return result
 
     def checkfriends (self, lastupdate = '', mask = 0):
         '''checkfriends - Checks to see if your friends list has been updated since a specified time.
@@ -334,20 +354,27 @@ class LiveJournal:
         if self.user is not None:
             args = self._required_headers (lastupdate = lastupdate, mask = mask)
 
-            result = dictm (**self._do_request ('checkfriends', args.__dict__))
+            result = dictm (**self._do_request ('checkfriends', args))
         else:
             result = None
 
         return result
 
-    def consolecommand (self):
+    def consolecommand (self, commands):
         '''consolecommand - Run an administrative command.
 
         The LiveJournal server has a text-based shell-like admininistration
         console where less-often used commands can be entered. There's a web
         interface to this shell online, and this is another gateway to that.'''
 
-        pass
+        if self.user is not None:
+            args = self._required_headers (commands = commands)
+
+            result = self._do_request ('consolecommand', args).get ('results', None)
+        else:
+            result = None
+
+        return result
 
 class Moods:
     '''Helper class to deal with moods.'''
