@@ -1,6 +1,8 @@
 #! /usr/bin/python
 
-from os.path import expanduser
+'''A console frontend to the administrative interface of LiveJournal servers.
+'''
+
 import readline
 from locale import getdefaultlocale
 
@@ -9,7 +11,7 @@ from livejournal.config import std_parser
 
 lang, defaultenc = getdefaultlocale ()
 
-parser = std_parser (usage = 'Usage: %prog [options]')
+parser = std_parser (usage = '%prog [options]')
 
 parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
                    help = 'specify character encoding',
