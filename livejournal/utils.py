@@ -14,10 +14,34 @@
 # along with this program; if not, write to the Free Software 
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# this file just provides a list of all stuff we expect the developer to use
+# this file contains helper functions
 
-__all__ = [ 'LiveJournal', 'LJError', 'Config', 'evalue']
+import re
 
-from livejournal.livejournal import LiveJournal, LJError
-from livejournal.config import Config, evalue
-from utils import list2list, list2mask
+_spaces = re.compile (r'\s*,\s*')
+
+def list2list (arg):
+    return _spaces.split (arg)
+
+l2m_specials = [ 'public', 'private', 'friends' ]
+
+def list2mask (arg, groups):
+    gg = map (lambda x : x.lower (), list2list (arg))
+
+    for special in l2m_specials:
+        if special in gg:
+            gg = special
+            break
+
+    if gg in l2m_specials:
+        security = gg
+    else:
+        mask = 0
+
+        for group in groups:
+            if group.name in gg:
+                mask |= (1 << group.id)
+
+        security = str (mask)
+
+    return security

@@ -29,10 +29,6 @@ from types import StringType, UnicodeType, DictType
 import re
 from time import time, localtime, asctime
 
-from ConfigParser import ConfigParser, NoOptionError
-
-from pprint import PrettyPrinter
-
 __version__ = '$Revision$'
 __date__ = '$Date$'
 
@@ -558,85 +554,3 @@ class Moods:
     def __init__ (self):
         self._moods = {}
         self.children = {}
-
-def evalue (*values):
-    '''find an effective value'''
-
-    result = values[0]
-
-    for i in range (len (values) - 1, 0, -1):
-        if values[i] is not None:
-            result = values[i]
-            break
-
-    return result
-
-class Config:
-    def __init__ (self):
-        pass
-
-    def load (self, name):
-        self._cp = ConfigParser ()
-        self._cp.read (os.path.expanduser (name))
-
-    def __hasattr__ (self, name):
-        return self._cp.has_section (name)
-
-    def __getattr__ (self, name):
-        return ConfigSection (self._cp, name)
-
-    def __setattr__ (self, name, value):
-        if name in [ '_cp' ]:
-            self.__dict__[name] = value
-        else:
-            pass # do nothing
-
-class ConfigSection:
-    def __init__ (self, config, section):
-        self._config = config
-        self._section = section
-
-    def __hasattr__ (self, name):
-        return self._config.has_option (self._section, name)
-
-    def __getattr__ (self, name):
-        try:
-            result = self._config.get (self._section, name)
-        except NoOptionError:
-            result = None
-
-        return result
-
-    def __setattr__ (self, name, value):
-        if name in [ '_config', '_section' ]:
-            self.__dict__[name] = value
-        else:
-            self._config.set (self._section, name, value)
-
-_spaces = re.compile (r'\s*,\s*')
-
-def list2list (arg):
-    return _spaces.split (arg)
-
-l2m_specials = [ 'public', 'private', 'friends' ]
-
-def list2mask (arg, groups):
-    gg = map (lambda x : x.lower (), list2list (arg))
-
-    for special in l2m_specials:
-        if special in gg:
-            gg = special
-            break
-
-    if gg in l2m_specials:
-        security = gg
-    else:
-        mask = 0
-
-        for group in groups:
-            if group.name in gg:
-                mask |= (1 << group.id)
-
-        security = str (mask)
-
-    return security
