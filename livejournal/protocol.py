@@ -115,6 +115,21 @@ class LiveJournal:
 
         return args
 
+    def format (self, event):
+        '''this function is used for properly formatting entries obtained from the lj-server'''
+        props = getattr (event, 'props', {})
+
+        if props.get ('opt_preformatted', 0):
+            tempo  = event.event
+            
+            pass    # actual formatting is performed here...
+
+            result = tempo
+        else:
+            result = event.event    # no formatting is performed.
+
+        return result
+
     def login (self, user, password, getmoods = None, getmenus = None, getpickws = None, getpickwurls = None):
         '''login - validate user's password and get base information needed for
         client to function
