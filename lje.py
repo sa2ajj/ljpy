@@ -35,9 +35,9 @@ parser.add_option ('-S', '--security',
                    action = 'store', type = 'string', dest = 'security', default = 'public',
                    help = 'restrict access to the item',
                    metavar = 'SECURITY')
-parser.add_option ('-P', '--preformatted',
-                   action = 'store_true', dest = 'preformatted',
-                   help = 'consider the item to be preformatted', default = 0)
+parser.add_option ('-o', '--options',
+                   action = 'store', type = 'string', dest = 'options', default = None,
+                   help = 'list of options for the entry')
 
 options, args = parser.parse_args ()
 
@@ -65,7 +65,7 @@ if options.music is not None:
 config = Config ()
 config.load (evalue ('~/.ljrc', options.config))
 
-server = config.server
+server = getattr (config, options.server)
 
 lj = LiveJournal (config.misc.version)
 

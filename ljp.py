@@ -4,20 +4,13 @@ import sys
 
 from locale import getdefaultlocale
 
-try:
-    from optik import OptionParser
-except ImportError:
-    printf >> sys.stderr, "Optik module is really required for this program to work"
-    sys.exit (1)
-
 from livejournal import LiveJournal, list2list, list2mask, Config, evalue
-from livejournal.config import add_std_options
+from livejournal.config import std_parser
+from livejournal.convert import args2text, text2args
 
 lang, defaultenc = getdefaultlocale ()
 
-parser = OptionParser (usage = 'Usage: %prog [options] [message text with spaces]')
-
-add_std_options (parser)
+parser = std_parser (usage = 'Usage: %prog [options] [message text with spaces]')
 
 parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
                    help = 'specify character encoding',
@@ -45,14 +38,15 @@ parser.add_option ('-M', '--music',
                    metavar = 'MUSIC')
 parser.add_option ('-b', '--batch',
                    action = 'store_true', dest = 'batch', default = None,
-                   help = 'use in a batch: the text will be read from the standard input and posted right away')
+                   help = 'use in a batch mode: the text will be read from the standard input and posted right away')
 parser.add_option ('-i', '--include',
                    action = 'store', dest = 'draft', default = None,
-                   help = 'specify the file, which contains the draft of the message (only in non-batch mode)',
+                   help = 'specify the file, which contains the draft of the message (this option is avilable only in non-batch mode)',
                    metavar = 'FILE')
 
 options, args = parser.parse_args ()
 
+# MSS: i may want to be able to specify the encoding from the configuration file
 encoding = evalue (defaultenc, options.encoding)
 
 subject = options.subject
@@ -80,7 +74,7 @@ if options.music is not None:
 config = Config ()
 config.load (evalue ('~/.ljrc', options.config))
 
-server = config.server
+server = getattr (config, options.server)
 ljp = config.ljp
 
 username = evalue (server.username, options.username)
@@ -92,7 +86,7 @@ if username is None or password is None:
 
 usejournal = evalue (None, options.journal)
 
-lj = LiveJournal ('Python-ljpy/0.1.0')
+lj = LiveJournal (config.misc.version)
 
 info = lj.login (username, password)
 
@@ -101,6 +95,20 @@ security = list2mask (options.security, info.friendgroups)
 if evalue (None, ljp.batch, options.batch):
     body = body + '\n' + sys.stdin.read ()
 else:
+    # At this point we have the following variables holding useful information:
+    #  -- body
+    #  -- subject
+    #  -- props
+    #  -- usejournal
+    #  -- security
+
+    if 0:
+        text = args2text (info = info, event = body, usejournal = usejournal, subject = subject, props = props, security = options.security)
+
+        pass #  process the text
+
+        # subject, usejournal, body, props, security = text2args (info, text)
+
     print 'Sorry, non-batch mode is not supported yet'
     sys.exit (1)
 

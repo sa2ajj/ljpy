@@ -22,7 +22,7 @@ encoding = evalue (defaultenc, options.encoding)
 config = Config ()
 config.load (evalue ('~/.ljrc', options.config))
 
-server = config.server
+server = getattr (config, options.server)
 ljac = config.ljac
 
 username = evalue (server.username, options.username)

@@ -87,12 +87,16 @@ unfortunately, this function has purely side effect (which I, personally, do not
     parser.add_option ('-C', '--config', type='string', dest='config', default = None,
                     help = 'specify a config file',
                     metavar = 'CONFIG')
+    parser.add_option ('-P', '--server', type='string', dest='server', default = 'server',
+                    help = 'specify the server section within the configuration file',
+                    metavar = 'SECTION')
     parser.add_option ('-u', '--username', type='string', dest='username', default = None,
                     help = 'specify username, otherwise the one from the configuration file is used',
                     metavar = 'USER')
     parser.add_option ('-p', '--password', type='string', dest='password', default = None,
                     help = 'specify password, otherwise the one from the configuration file is used',
                     metavar = 'PASSWORD')
+    
 
 def std_parser (usage = None):
     try:

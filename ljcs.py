@@ -17,7 +17,7 @@ options, args = parser.parse_args ()
 config = Config ()
 config.load (evalue ('~/.ljrc', options.config))
 
-server = config.server
+server = getattr (config, options.server)
 
 username = evalue (server.username, options.username)
 password = evalue (server.password, options.password)
