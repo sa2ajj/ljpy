@@ -181,9 +181,7 @@ class LiveJournal:
         if type (props) is DictType:
             args.props = props  # i do not check if the properties are correct, maybe it's a good idea to do that? :)
 
-        result = self._do_request ('postevent', args)
-
-        return result
+        return record (**self._do_request ('postevent', args))
 
     def editevent (self, id, event, date = None, subject = None, usejournal = None, security = None, when = None, props = None):
         '''editevent - Edit or delete a user's past journal entry
