@@ -603,3 +603,26 @@ class Config:
             output.write ('%s = ' % name)
             pp.pprint (getattr (self, name))
             output.write ('\n')
+
+l2m_specials = [ 'public', 'private', 'friends' ]
+
+def list2mask (arg, groups):
+    gg = map (lambda x : x.lower (), arg.split (','))
+
+    for special in l2m_specials:
+        if special in gg:
+            gg = special
+            break
+
+    if gg in l2m_specials:
+        security = gg
+    else:
+        mask = 0
+
+        for group in groups:
+            if group.name in gg:
+                mask |= (1 << group.id)
+
+        security = str (mask)
+
+    return security
