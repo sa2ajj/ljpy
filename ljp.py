@@ -1,132 +1,145 @@
 #! /usr/bin/python
 
-import sys
+'''Submit a new log entry to the server.
 
-from locale import getdefaultlocale
+Given all of the required information on a post will create a new
+entry.  The URL for the newly added entry is printed on the screen
+for further peruse.
+'''
 
-from livejournal import LiveJournal, list2list, list2mask, Config, evalue
-from livejournal.config import std_parser
-from livejournal.convert import args2text, text2args
+__author__ = 'Mikhail Sobolev'
+__copyright__ = 'Copyright (c) 2002, 2003, Mikhail Sobolev'
+__version__ = '$Revision$'
+__date__ = '$Date$'
 
-lang, defaultenc = getdefaultlocale ()
+if __name__ == '__main__':
+    import sys
 
-parser = std_parser (usage = 'Usage: %prog [options] [message text with spaces]')
+    from locale import getdefaultlocale
 
-parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
-                   help = 'specify character encoding',
-                   metavar = 'ENCODING')
-parser.add_option ('-j', '--journal', type='string', dest='journal', default = None,
-                   help = 'specify the journal to post to',
-                   metavar = 'JOURNAL')
-parser.add_option ('-S', '--security',
-                   action = 'store', type = 'string', dest = 'security', default = 'public',
-                   help = 'restrict access to the item', metavar = 'SECURITY')
-parser.add_option ('-o', '--options',
-                   action = 'store', type = 'string', dest = 'options', default = None,
-                   help = 'list of options for the entry')
-parser.add_option ('-s', '--subject',
-                   action = 'store', type = 'string', dest = 'subject', default = None,
-                   help = 'specify a subject for the event',
-                   metavar = 'SUBJECT')
-parser.add_option ('-m', '--mood',
-                   action = 'store', type = 'string', dest = 'mood', default = None,
-                   help = 'tell them what mood you are in',
-                   metavar = 'MOOD')
-parser.add_option ('-M', '--music',
-                   action = 'store', type = 'string', dest = 'music', default = None,
-                   help = 'tell them what music you are listening to',
-                   metavar = 'MUSIC')
-parser.add_option ('-b', '--batch',
-                   action = 'store_true', dest = 'batch', default = None,
-                   help = 'use in a batch mode: the text will be read from the standard input and posted right away')
-parser.add_option ('-i', '--include',
-                   action = 'store', dest = 'draft', default = None,
-                   help = 'specify the file, which contains the draft of the message (this option is avilable only in non-batch mode)',
-                   metavar = 'FILE')
+    from livejournal import LiveJournal, list2list, list2mask, Config, evalue
+    from livejournal.config import std_parser
+    from livejournal.convert import args2text, text2args
 
-options, args = parser.parse_args ()
+    lang, defaultenc = getdefaultlocale ()
 
-# MSS: i may want to be able to specify the encoding from the configuration file
-encoding = evalue (defaultenc, options.encoding)
+    parser = std_parser (usage = '%prog [options] [message text with spaces]')
 
-subject = options.subject
+    parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
+                    help = 'specify character encoding',
+                    metavar = 'ENCODING')
+    parser.add_option ('-j', '--journal', type='string', dest='journal', default = None,
+                    help = 'specify the journal to post to',
+                    metavar = 'JOURNAL')
+    parser.add_option ('-S', '--security',
+                    action = 'store', type = 'string', dest = 'security', default = 'public',
+                    help = 'restrict access to the item', metavar = 'SECURITY')
+    parser.add_option ('-o', '--options',
+                    action = 'store', type = 'string', dest = 'options', default = None,
+                    help = 'list of options for the entry')
+    parser.add_option ('-s', '--subject',
+                    action = 'store', type = 'string', dest = 'subject', default = None,
+                    help = 'specify a subject for the event',
+                    metavar = 'SUBJECT')
+    parser.add_option ('-m', '--mood',
+                    action = 'store', type = 'string', dest = 'mood', default = None,
+                    help = 'tell them what mood you are in',
+                    metavar = 'MOOD')
+    parser.add_option ('-M', '--music',
+                    action = 'store', type = 'string', dest = 'music', default = None,
+                    help = 'tell them what music you are listening to',
+                    metavar = 'MUSIC')
+    parser.add_option ('-b', '--batch',
+                    action = 'store_true', dest = 'batch', default = None,
+                    help = 'use in a batch mode: the text will be read from the standard input and posted right away')
+    parser.add_option ('-i', '--include',
+                    action = 'store', dest = 'draft', default = None,
+                    help = 'specify the file, which contains the draft of the message (this option is avilable only in non-batch mode)',
+                    metavar = 'FILE')
 
-if len (args) > 0:
-    body = ' '.join (args)
-else:
-    body = ''
+    options, args = parser.parse_args ()
 
-props = {}
+    # MSS: i may want to be able to specify the encoding from the configuration file
+    encoding = evalue (defaultenc, options.encoding)
 
-if options.options is not None:
-    for option in list2list (options.options):
-        if option in [ 'preformatted', 'nocomments', 'backdated', 'noemail' ]:
-            props['opt_%s' % option] = 1
-        else:
-            print 'Ignoring unknown option:', option
+    subject = options.subject
 
-if options.mood is not None:
-    props['current_mood'] = options.mood
+    if len (args) > 0:
+        body = ' '.join (args)
+    else:
+        body = ''
 
-if options.music is not None:
-    props['current_music'] = options.music
+    props = {}
 
-config = Config ()
-config.load (evalue ('~/.ljrc', options.config))
+    if options.options is not None:
+        for option in list2list (options.options):
+            if option in [ 'preformatted', 'nocomments', 'backdated', 'noemail' ]:
+                props['opt_%s' % option] = 1
+            else:
+                print 'Ignoring unknown option:', option
 
-server = getattr (config, options.server)
-ljp = config.ljp
+    if options.mood is not None:
+        props['current_mood'] = options.mood
 
-username = evalue (server.username, options.username)
-password = evalue (server.password, options.password)
+    if options.music is not None:
+        props['current_music'] = options.music
 
-if username is None or password is None:
-    print "You must provide both user name and password"
-    sys.exit (2)
+    config = Config ()
+    config.load (evalue ('~/.ljrc', options.config))
 
-usejournal = evalue (None, options.journal)
+    server = getattr (config, options.server)
+    ljp = config.ljp
 
-lj = LiveJournal (config.misc.version)
+    username = evalue (server.username, options.username)
+    password = evalue (server.password, options.password)
 
-info = lj.login (username, password)
+    if username is None or password is None:
+        print "You must provide both user name and password"
+        sys.exit (2)
 
-security = list2mask (options.security, info.friendgroups)
+    usejournal = evalue (None, options.journal)
 
-if evalue (None, ljp.batch, options.batch):
-    body = body + '\n' + sys.stdin.read ()
-else:
-    # At this point we have the following variables holding useful information:
-    #  -- body
-    #  -- subject
-    #  -- props
-    #  -- usejournal
-    #  -- security
+    lj = LiveJournal (config.misc.version)
 
-    if 0:
-        text = args2text (info = info, event = body, usejournal = usejournal, subject = subject, props = props, security = options.security)
+    info = lj.login (username, password)
 
-        pass #  process the text
+    security = list2mask (options.security, info.friendgroups)
 
-        # subject, usejournal, body, props, security = text2args (info, text)
+    if evalue (None, ljp.batch, options.batch):
+        body = body + '\n' + sys.stdin.read ()
+    else:
+        # At this point we have the following variables holding useful information:
+        #  -- body
+        #  -- subject
+        #  -- props
+        #  -- usejournal
+        #  -- security
 
-    print 'Sorry, non-batch mode is not supported yet'
-    sys.exit (1)
+        if 0:
+            text = args2text (info = info, event = body, usejournal = usejournal, subject = subject, props = props, security = options.security)
 
-body = unicode (body, encoding)
+            pass #  process the text
 
-if subject is not None:
-    subject = unicode (subject, encoding)
+            # subject, usejournal, body, props, security = text2args (info, text)
 
-if props.has_key ('current_mood'):
-    props['current_mood'] = unicode (props['current_mood'], encoding)
+        print 'Sorry, non-batch mode is not supported yet'
+        sys.exit (1)
 
-if props.has_key ('current_music'):
-    props['current_music'] = unicode (props['current_music'], encoding)
+    body = unicode (body, encoding)
 
-entry = lj.postevent (body,
-                usejournal = usejournal,
-                subject = subject,
-                props = props,
-                security = security)
+    if subject is not None:
+        subject = unicode (subject, encoding)
 
-print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (usejournal or server.username, entry.itemid*256 + entry.anum)
+    if props.has_key ('current_mood'):
+        props['current_mood'] = unicode (props['current_mood'], encoding)
+
+    if props.has_key ('current_music'):
+        props['current_music'] = unicode (props['current_music'], encoding)
+
+    entry = lj.postevent (body,
+                    usejournal = usejournal,
+                    subject = subject,
+                    props = props,
+                    security = security)
+
+    print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (usejournal or server.username, entry.itemid*256 + entry.anum)
