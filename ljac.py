@@ -2,22 +2,43 @@
 
 from os.path import expanduser
 import readline
+from locale import getdefaultlocale
 
-from livejournal import LiveJournal, Config
+from livejournal import LiveJournal, Config, evalue
+from livejournal.config import std_parser
+
+lang, defaultenc = getdefaultlocale ()
+
+parser = std_parser (usage = 'Usage: %prog [options]')
+
+parser.add_option ('-e', '--encoding', type='string', dest='encoding', default = None,
+                   help = 'specify character encoding',
+                   metavar = 'ENCODING')
+
+options, args = parser.parse_args ()
+
+encoding = evalue (defaultenc, options.encoding)
 
 config = Config ()
-config.load ('~/.ljrc')
+config.load (evalue ('~/.ljrc', options.config))
 
 server = config.server
+ljac = config.ljac
 
-lj = LiveJournal ('Python-ljpy/0.0.1')
+username = evalue (server.username, options.username)
+password = evalue (server.password, options.password)
 
-from pprint import pprint
+if username is None or password is None:
+    print "You must provide both user name and password"
+    sys.exit (2)
 
-info = lj.login (server.username, server.password)
+lj = LiveJournal (config.misc.version)
+
+info = lj.login (username, password)
 
 if info.message is not None:
-    print 'Message from server:', info.message
+    for line in info.message.split ('\n'):
+        print 'Server:', line
 
 def execute (commands):
     result = lj.consolecommand (commands)
