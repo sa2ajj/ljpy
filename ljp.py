@@ -7,13 +7,13 @@ from locale import getdefaultlocale
 
 try:
     from optik import OptionParser
-except ImportError
+except ImportError:
     printf >> sys.stderr, "Optik module is really required for this program to work"
     sys.exit (1)
 
 from livejournal import LiveJournal, list2mask, Config, evalue
 
-lang, enc = getdefaultlocale ()
+lang, defaultenc = getdefaultlocale ()
 
 parser = OptionParser ()
 
@@ -54,15 +54,17 @@ parser.add_option ('-P', '--preformatted',
 
 options, args = parser.parse_args ()
 
+encoding = evalue (defaultenc, options.encoding)
+
 if len (args) > 0:
     event = ' '.join (args)
 else:
     event = sys.stdin.read ()
 
-event = unicode (event, 'koi8-r')
+event = unicode (event, encoding)
 
 if options.subject is not None:
-    subject = unicode (options.subject, 'koi8-r')
+    subject = unicode (options.subject, encoding)
 else:
     subject = None
 
