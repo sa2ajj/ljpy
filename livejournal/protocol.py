@@ -243,8 +243,20 @@ class LiveJournal:
     def getevents (self):
         raise 'Sorry this function is not implemented in a way as it is described in LJ'
 
-    def _getevents (self, args):
+    def _getevents (self, args, usejournal, truncate, prefersubjects, noprops):
         '''helper function to process what getevents returned'''
+
+        if usejournal is not None:
+            args.usejournal = usejournal
+
+        if truncate is not None:
+            args.truncate = truncate
+
+        if noprops is not None:
+            args.noprops = noprops
+
+        if prefersubjects is not None:
+            args.prefersubjects = prefersubjects
 
         what = self._do_request ('getevents', args)
 
@@ -263,37 +275,48 @@ class LiveJournal:
 
         return result
 
-    def getevents_last (self, howmany = 20, beforedate = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+    def getevents_last (self, howmany = None, beforedate = None, usejournal = None, truncate = None, prefersubject = None, noprops = None):
         self._logged_in ()
 
         # mss: i am not sure that this assert is a really good idea: lj
         # should return an error anyway.
-        assert howmany <= 50
-        args = self._required_headers (selecttype = 'lastn', howmany = howmany)
+        args = self._required_headers (selecttype = 'lastn')
+        
+        if howmany is not None:
+            args.howmany = howmany
 
         if beforedate is not None:
             args.beforedate = beforedate
 
-        result = self._getevents (args)
+        result = self._getevents (args, usejournal, truncate, prefersubject, noprops)
 
         return result
 
-    def getevents_day (self, day = None, month = None, year = None, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+    def getevents_day (self, date, usejournal = None, truncate = None, prefersubject = None, noprops = None):
         self._logged_in ()
 
-        result = None
+        args = self._required_headers (selecttype = 'day')
 
-        return result
+        args.year, args.mon, args.day, args.hour, args.min = getdate (date)
 
-    def getevent (self, id, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+        return self._getevents (args, usejournal, truncate, prefersubject, noprops)
+
+    def getevent (self, id, usejournal = None, truncate = None, prefersubject = None, noprops = None):
         self._logged_in ()
 
-        pass
+        args = self._required_headers (selecttype = 'one', itemid = id)
 
-    def getevents_sync (self, usejournal = None, truncate = 3, prefersubject = 0, noprops = 0):
+        return self._getevents (args, usejournal, truncate, prefersubject, noprops)
+
+    def getevents_sync (self, lastsync = None, usejournal = None, truncate = None, prefersubject = None, noprops = None):
         self._logged_in ()
 
-        pass
+        args = self._required_headers (selecttype = 'syncitems')
+
+        if lastsync is not None:
+            args.lastsync = lastsync
+
+        return self._getevents (args, usejournal, truncate, prefersubject, noprops)
 
     def getfriends (self, includefriendof = None, includegroups = None, friendlimit = None):
         '''getfriends - Returns a list of which other LiveJournal users this user lists as their friend.
