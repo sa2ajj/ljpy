@@ -32,6 +32,12 @@ parser.add_option ('-e', '--encoding', type='string', dest='encoding', default =
 parser.add_option ('-j', '--journal', type='string', dest='journal', default = None,
                    help = 'specify the journal to post to',
                    metavar = 'JOURNAL')
+parser.add_option ('-S', '--security',
+                   action = 'store', type = 'string', dest = 'security', default = 'public',
+                   help = 'restrict access to the item', metavar = 'SECURITY')
+parser.add_option ('-o', '--options',
+                   action = 'store', type = 'string', dest = 'options', default = None,
+                   help = 'list of options for the entry')
 parser.add_option ('-s', '--subject',
                    action = 'store', type = 'string', dest = 'subject', default = None,
                    help = 'specify a subject for the event',
@@ -44,13 +50,13 @@ parser.add_option ('-M', '--music',
                    action = 'store', type = 'string', dest = 'music', default = None,
                    help = 'tell them what music you are listening to',
                    metavar = 'MUSIC')
-parser.add_option ('-S', '--security',
-                   action = 'store', type = 'string', dest = 'security', default = 'public',
-                   help = 'restrict access to the item',
-                   metavar = 'SECURITY')
-parser.add_option ('-P', '--preformatted',
-                   action = 'store_true', dest = 'preformatted',
-                   help = 'consider the item to be preformatted', default = 0)
+parser.add_option ('-b', '--batch',
+                   action = 'store_true', dest = 'batch', default = 0,
+                   help = 'use in a batch: the text will be read from the standard input and posted right away')
+parser.add_option ('-i', '--include',
+                   action = 'store', dest = 'draft', default = None,
+                   help = 'specify the file, which contains the draft of the message (only in non-batch mode)',
+                   metavar = 'FILE')
 
 options, args = parser.parse_args ()
 
