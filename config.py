@@ -4,7 +4,7 @@ import time, os
 from pprint import PrettyPrinter
 
 class Config:
-    __valid_params = [ 'username', 'password' ]
+    valid_params = [ 'username', 'password' ]
 
     def __init__ (self, **kw):
         self.update (kw)
@@ -14,8 +14,8 @@ class Config:
             setattr (self, k, v)
 
     def __setattr__ (self, name, value):
-        if name not in [ self.__valid_params ]:
-            raise KeyValue, 'invalid key: %s' % name
+        if name not in self.valid_params:
+            raise KeyError, 'invalid key: %s' % name
 
         self.__dict__[name] = value
 
@@ -27,10 +27,10 @@ class Config:
             execfile (name, tempo)
         except IOError, exc:
             if exc.filename is None:    # arg! execfile() loses filename
-                exc.filename = filename
+                exc.filename = name
             raise exc
 
-        for name in self.__valid_params:
+        for name in self.valid_params:
             if tempo.has_key (name):
                 setattr (self, name, tempo[name])
 
