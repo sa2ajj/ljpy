@@ -224,7 +224,7 @@ class LiveJournal:
 
         return result
 
-    def editfriendgroups (self):
+    def editfriendgroups (self, groupmasks = None, set = None, delete = None):
         '''editfriendgroups - Edit the user's defined groups of friends.
 
         Given several optional lists, will add/delete/update/rename the friends
@@ -232,9 +232,22 @@ class LiveJournal:
 
         self._logged_in ()
 
-        pass
+        args = self._required_headers ()
 
-    def editfriends (self):
+        if groupmasks is not None:
+            args.groupmasks = groupmasks    # must be a dict
+
+        if set is not None:
+            args.set = set                  # must be a dict
+
+        if delete is not None:
+            args.delete = delete            # must be an array of strings
+
+        result = self._do_request ('editfriendgroups', args)
+
+        return result
+
+    def editfriends (self, delete = None, add = None):
         '''editfriends - Add, edit, or delete friends from the user's friends list.
 
         Takes up to two lists, one of friends to delete and one of friends to add.
@@ -243,7 +256,36 @@ class LiveJournal:
 
         self._logged_in ()
 
-        pass
+        args = self._required_headers ()
+
+        if delete is not None:
+            args.delete = delete
+
+        if add is not None:
+            assert type (add) == ListType
+
+            tempo = []
+
+            for user in add:
+                if type (user) in [ StringType, UnicodeType ]:
+                    tempo.append (mdict (username = user))
+                elif isinstance (user, record) or type (user) == DictType:
+                    what = isinstance (user, record) and user.__dict__ or user
+
+                    tempo.append (what)
+                else:
+                    pass    # error!
+
+            args.add = tempo
+
+        result = self._do_request ('editfriends', args)
+
+        if result.has_key ('added'):
+            result = listofrecords (result['added'])
+        else:
+            result = None
+
+        return result
 
     def getevents (self):
         '''getevents - Download parts of the user's journal.
@@ -374,7 +416,7 @@ class LiveJournal:
 
         return result
 
-    def friendof (self):
+    def friendof (self, friendoflimit = None):
         '''friendof - Returns a list of which other LiveJournal users list this user as their friend.
 
         Returns a "friends of" list for a specified user. An optional limit of
@@ -382,16 +424,40 @@ class LiveJournal:
 
         self._logged_in ()
 
-        pass
+        args = self._required_headers ()
 
-    def getfriendgroups (self):
+        if friendoflimit is not None:
+            args.friendoflimit = friendoflimit
+
+        result = self._do_request ('friendof', args)
+
+        if result.has_key ('friendofs'):
+            result = listofrecords (result['friendofs'])
+        else:
+            result = None
+
+        return result
+
+    def getfriendgroups (self, friendoflimit = None):
         '''getfriendgroups - Retrieves a list of the user's defined groups of friends.
 
         Retrieves a list of the user's defined groups of friends.'''
 
         self._logged_in ()
 
-        pass
+        args = self._required_headers ()
+
+        if friendoflimit is not None:
+            args.friendoflimit = friendoflimit
+
+        result = self._do_request ('getfriendgroups', args)
+
+        if result.has_key ('friendgroups'):
+            result = listofrecords (result['friendgroups'])
+        else:
+            result = None
+
+        return result
 
     def getdaycounts (self, usejournal = None):
         '''getdaycounts - This mode retrieves the number of journal entries per day.
