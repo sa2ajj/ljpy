@@ -1,32 +1,25 @@
 <method name="sessiongenerate">
-<shortdes>
-Generate a session cookie.
-</shortdes>
-<des>
-In order to interact with some web based parts of the site, such as the
+<shortdes>Generate a session cookie.</shortdes>
+<des>In order to interact with some web based parts of the site, such as the
 comment exporter, it is often useful to be able to generate a login cookie
-without having to actually post login information to the login.bml page.
-This mode will, with proper authentication, provide you with a session
-cookie to use for authentication purposes.
-</des>
+without having to actually post login information to the login.bml page.  This
+mode will, with proper authentication, provide you with a session cookie to use
+for authentication purposes.</des>
 <arguments><struct count="1">
 
 &authInfo;
 
 <key name="expiration" count="opt">
-<scalar><des>
-Sessions can either expire in a short amount of time or last for a long period
-of time.  You can specify either "short" or "long" as the value of this parameter.
-</des></scalar>
+<scalar><des>Sessions can either expire in a short amount of time or last for a
+long period of time.  You can specify either "short" or "long" as the value of
+this parameter.</des></scalar>
 </key>
 
 <key name="ipfixed" count="opt">
-<scalar><des>
-If specified and true, this will cause the server to generate a session that is
-only valid from the IP address the sessiongenerate request was sent from.  If you
-leave out this value, it will default to allowing any IP address to use this
-session information.
-</des></scalar>
+<scalar><des>If specified and true, this will cause the server to generate a
+session that is only valid from the IP address the sessiongenerate request was
+sent from.  If you leave out this value, it will default to allowing any IP
+address to use this session information.</des></scalar>
 </key>
 
 </struct></arguments>
@@ -74,9 +67,7 @@ Content-Length: 542
 <returns><struct count="1">
 
 <key name="ljsession" count="1">
-    <scalar><des>
-        The session generated.
-    </des></scalar>
+    <scalar><des>The session generated.</des></scalar>
 </key>
 
 </struct></returns>    
