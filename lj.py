@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
 
 '''this file is a sandbox for my experiments with differrent methods
 of the LiveJournal protocol.  Though I include this file in the distribution

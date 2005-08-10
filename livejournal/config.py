@@ -1,4 +1,6 @@
-# Copyright (C) 2002, 2003 by Mikhail Sobolev <mss@mawhrin.net>
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2002, 2003, 2004, 2005 by Mikhail Sobolev <mss@mawhrin.net>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -100,9 +102,9 @@ unfortunately, this function has purely side effect (which I, personally, do not
 
 def std_parser (usage = None):
     try:
-        from optik import OptionParser
+        from optparse import OptionParser
     except ImportError:
-        printf >> sys.stderr, "Optik module is really required for this program to work"
+        print >> sys.stderr, "optparse module is really required for this program to work"
         sys.exit (1)
 
     parser = OptionParser (usage)

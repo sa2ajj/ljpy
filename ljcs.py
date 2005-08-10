@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
 
 from livejournal import LiveJournal, Config, evalue, list2mask
 from livejournal.config import std_parser

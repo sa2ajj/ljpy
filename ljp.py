@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
 
 '''Submit a new log entry to the server.
 
@@ -8,7 +9,7 @@ for further peruse.
 '''
 
 __author__ = 'Mikhail Sobolev'
-__copyright__ = 'Copyright (c) 2002, 2003, Mikhail Sobolev'
+__copyright__ = 'Copyright (c) 2002, 2003, 2004, 2005 Mikhail Sobolev'
 __version__ = '$Revision$'
 __date__ = '$Date$'
 
@@ -143,3 +144,5 @@ if __name__ == '__main__':
                     security = security)
 
     print 'Posted.\nLink to the post: http://www.livejournal.com/talkread.bml?journal=%s&itemid=%s' % (usejournal or server.username, entry.itemid*256 + entry.anum)
+
+# vim:ts=2:sw=2:noet

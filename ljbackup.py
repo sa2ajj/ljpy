@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
 
 from time import strftime, localtime, gmtime
 from os.path import expanduser

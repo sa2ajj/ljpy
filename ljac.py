@@ -1,4 +1,6 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
+#
 
 '''A console frontend to the administrative interface of LiveJournal servers.
 '''
