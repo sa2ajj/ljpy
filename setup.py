@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup (
     name = "ljpy",
-    version = "0.8",
+    version = "0.8.1",
     description = "Module and scripts for working with LiveJournal servers",
     long_description = '''\
 This is a simple implementation of XML-RPC variant of LiveJournal client-server
