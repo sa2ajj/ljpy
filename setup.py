@@ -19,3 +19,5 @@ protocol as of
     scripts = [ 'ljp.py', 'ljac.py' ],
     license = 'GPL v2'
 )
+
+# vim:ts=4:sw=4:noet
